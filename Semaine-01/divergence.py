@@ -15,7 +15,7 @@ dVdy, dVdx = np.gradient(V)
 div = dUdx*200./6. + dVdy*200./6. # to scale dx, dy
 
 plt.pcolor(X,Y,div)
-plt.axes().set_aspect('equal')
+# plt.axes().set_aspect('equal')
 plt.colorbar()
 
 plt.streamplot(X,Y,U,V,arrowsize=2.,color='k')
@@ -23,6 +23,6 @@ plt.xlabel('x')
 plt.ylabel('y')
 plt.xlim([-3,3])
 plt.ylim([-3,3])
-plt.axes().set_aspect('equal')
+# plt.axes().set_aspect('equal')
 
 plt.show()

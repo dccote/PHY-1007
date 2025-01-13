@@ -15,7 +15,7 @@ plt.xlabel('x')
 plt.ylabel('y')
 plt.xlim([0.25,1.45])
 plt.ylim([-2.6,-1.4])
-plt.axes().set_aspect('equal')
+# plt.axes().set_aspect('equal')
 plt.show()
 
 # autour du max
@@ -24,7 +24,7 @@ plt.xlabel('x')
 plt.ylabel('y')
 plt.xlim([1,2])
 plt.ylim([-1,0])
-plt.axes().set_aspect('equal')
+# plt.axes().set_aspect('equal')
 plt.show()
 
 dUdy, dUdx = np.gradient(U)
@@ -34,7 +34,7 @@ dVdy, dVdx = np.gradient(V)
 rot = dVdx*200./6. - dUdy*200./6. # to scale dx, dy
 
 plt.pcolor(X,Y,rot)
-plt.axes().set_aspect('equal')
+# plt.axes().set_aspect('equal')
 plt.colorbar()
 
 plt.streamplot(X,Y,U,V,arrowsize=2.,color='k')
@@ -42,7 +42,7 @@ plt.xlabel('x')
 plt.ylabel('y')
 plt.xlim([-3,3])
 plt.ylim([-3,3])
-plt.axes().set_aspect('equal')
+# plt.axes().set_aspect('equal')
 
 plt.show()
 
