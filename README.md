@@ -5,11 +5,11 @@ Pour commencer, les exemples demandent simplement de savoir le noms de commandes
 
 ## Semaine-01: 
 
-Du code fait par Louis pour vous donnez des exemples de ce qui est possible comme visualisation.
+Du code fait par Louis Archambault pour vous donnez des exemples de ce qui est possible comme visualisation.
 
 ## Semaine-02
 
-Du code fait par moi pour vous prendre par la main et vous montrer la progression dans du code qui commence très simplement et qui itérativement s'améliore. J'ai bien l'intention de continuer à améliorer ce code à chaque semaine.  Lisez les fichiers en ordre de numéro pour bien suivre la progression.
+Du code fait par [Daniel C. Côté](https://github.com/dccote) pour vous prendre par la main et vous montrer la progression dans du code qui commence très simplement et qui itérativement s'améliore. J'ai bien l'intention de continuer à améliorer ce code à chaque semaine.  Lisez les fichiers en ordre de numéro pour bien suivre la progression.
 
 * **01à 05:** Vous avez donc le plus simple code Python pour afficher une fleche sur un graphique et a la fin, du code qui affiche un champ dans le plan. Pour du code procédural, c'est le mieux qu'on puisse faire pour faire un graphique en peu de ligne. Vous verrez que le code demande quand même un peu de gestion trivial de différents aspects et malgré tout, reste suffisamment difficile reutilisable: il faut essentiellement recopier le code.
 
