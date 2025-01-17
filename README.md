@@ -3,6 +3,14 @@ Code associé au cours de PHY-1007: Électromagnétisme à l'Université Laval. 
 
 Pour commencer, les exemples demandent simplement de savoir le noms de commandes pour faire des graphiques (champ scalaire, vectoriel, etc...).
 
-* Semaine-01: Des exemples faits par Louis Archambault pour vous donner une idée des possiblités
-* Semaine-02: Pour travailler avec des champs, il sera nécessaire de les visualiser. On commence avec des graphiques de champs vectoriels en 2D.  Le code dans ce répertoire vous prend par la main pour vous montrer le strict minimum pour mettre une flèche sur un graphique pour lentement vous amener à un ensemble de flèches (i.e. un champ) sur la totalité du graphique. Commencez par les 01 à 05 (vector fields) dans cet ordre.
-  
+## Semaine-01: 
+
+Du code fait par Louis pour vous donnez des exemples de ce qui est possible comme visualisation.
+
+## Semaine-02
+
+Du code fait par moi pour vous prendre par la main et vous montrer la progression dans du code qui commence très simplement et qui itérativement s'améliore. J'ai bien l'intention de continuer à améliorer ce code à chaque semaine.  Lisez les fichiers en ordre de numéro pour bien suivre la progression.
+
+* **01à 05:** Vous avez donc le plus simple code Python pour afficher une fleche sur un graphique et a la fin, du code qui affiche un champ dans le plan. Pour du code procédural, c'est le mieux qu'on puisse faire pour faire un graphique en peu de ligne. Vous verrez que le code demande quand même un peu de gestion trivial de différents aspects et malgré tout, reste suffisamment difficile reutilisable: il faut essentiellement recopier le code.
+
+* **06-??:** Pour pouvoir mieux réutiliser le code, la solution est de faire une classe qui encaspule les détails et les gère. Vous verrez une utilisation de code "orienté-objet" pour faire des classes et simplifier l'utilisation à long terme dans d'autres projet. Je vais continuer de faire le code tout au long de la fin de semaine.
