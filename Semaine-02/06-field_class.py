@@ -103,6 +103,8 @@ C'est un peu mieux, mais il y a encore plusieurs amélioration possibles:
 1. Il faudrait trouver une facon de rapidement choisir des exemples de champs (charge simple, dipole, sphère, etc...)
 2. Il faudrait raffiner le contrôle du champ
 3. Il faudrait permettre l'ajustement des détails de l'affichage
-4. Et encore plus...
+4. Il faudrait valider les données pour éviter des variables X,Y et U,V incompatibles
+5. Et encore plus...
+
 
 """
