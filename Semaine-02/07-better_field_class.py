@@ -97,7 +97,8 @@ class VectorField2D:
 
 
 
-if __name__ == "__main__":
+
+if __name__ == "__main__": # C'est la facile rigoureuse d'ajouter du code après une classe
 	field = VectorField2D(size=20)
 	field.display() # Le défaut est un champ en sinus et cosinus
 
