@@ -14,3 +14,12 @@ Du code fait par [Daniel C. Côté](https://github.com/dccote) pour vous prendre
 * **01à 05:** Vous avez donc le plus simple code Python pour afficher une fleche sur un graphique et a la fin, du code qui affiche un champ dans le plan. Pour du code procédural, c'est le mieux qu'on puisse faire pour faire un graphique en peu de ligne. Vous verrez que le code demande quand même un peu de gestion trivial de différents aspects et malgré tout, reste suffisamment difficile reutilisable: il faut essentiellement recopier le code.
 
 * **06-??:** Pour pouvoir mieux réutiliser le code, la solution est de faire une classe qui encaspule les détails et les gère. Vous verrez une utilisation de code "orienté-objet" pour faire des classes et simplifier l'utilisation à long terme dans d'autres projet. Je vais continuer de faire le code tout au long de la fin de semaine.
+
+
+calculer le champ provenant d'une collections de sources discrètes ou continues dans le système de coordonnées appropriés 
+
+évaluer les limites pour vérifier ses calculs, par exemple le champ loin d'un groupe de source
+
+calculer la divergence et e flux d'un champ électrique pour des situations
+
+savoir appliquer le théorème de Gauss 

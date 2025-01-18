@@ -9,7 +9,7 @@ difficile à comprendre.
 J'aimerais pouvoir rapidement changer le champ de facon efficace:
 
 field = VectorField()
-field.set_single_charge()
+field.create_single_charge_field_components()
 
 On remarquera que le champ d'une charge varie rapidement, donc l'utilisation de la longueur de la fleche
 pour représenter le champ devient problématique car c'est parfois trop long, ou c'est essentiellement nul
@@ -40,12 +40,13 @@ class VectorField2D:
 		self.validate_arrays() # Avant d'aller plus loin, nous voulons un champ valide
 
 	@property
-	def R(self):
-		return np.sqrt(self.X*self.X+self.Y*self.Y)
+	def xy_mesh(self):
+		return self.X, self.Y
 
 	@property
-	def PHI(self):
-		return np.atan2(self.Y, self.X)
+	def rphi_mesh(self):
+		X,Y = self.xy_mesh
+		return np.sqrt(X*X+Y*Y), np.atan2(Y, X)
 
 	@property
 	def field_magnitude(self):
@@ -60,21 +61,15 @@ class VectorField2D:
 		y = np.linspace(-size/2,size/2, N)
 		return np.meshgrid(x,y)
 
-	def create_null_field_components(self):
-		U = self.X*0
-		V = self.X*0
-		return U, V
+	def create_null_field_components(self):		
+		X,Y = self.xy_mesh
+		return X*0, X*0 # C'est un truc pour avoir rapidement une liste de la meme longueur avec des zeros
 
 	def create_demo_field_components(self):
-		U = np.sin(self.X/2)
-		V = np.cos(self.Y/2)
-		return U, V
+		X,Y = self.xy_mesh
+		return np.sin(X/2), np.cos(Y/2)
 
 	def create_single_charge_field_components(self):
-		U = self.X
-		V = self.Y
-		R = self.R
-		PHI = self.PHI
 
 		# On pourra se retrouver, parfois, avec R==0 (a l'origin), et donc 1/
 		# (R*R) sera infini. On veut éviter les infinités et les
@@ -82,6 +77,7 @@ class VectorField2D:
 		# ajouter un tout petit 0.01 a R*R pour eviter que cela donne une
 		# division par zero. C'est affreux, mais ca évite les
 		# problèmes.
+		R, PHI = self.rphi_mesh
 
 		return np.cos(PHI)/np.log(R*R+0.01), np.sin(PHI)/np.log(R*R+0.01)
 
@@ -98,9 +94,6 @@ class VectorField2D:
 		if len(self.U) != len(self.X):
 			raise ValueError("Les composantes U,V doivent avoir le meme nombre d'éléments que X et Y")
 
-	def xy_mesh(self):
-		return self.X, self.Y
-
 	def assign_field_components(self, U, V):
 		self.U = U
 		self.V = V
@@ -111,18 +104,22 @@ class VectorField2D:
 	def display(self, is_color=True):
 		self.validate_arrays()
 
+
 		if self.quiver_axes is None:
 			self.quiver_axes = plt.subplot(1,1,1)
 			self.quiver_axes.tick_params(direction="in")
 
-			if is_color:
-				lengths = self.field_magnitude
-				lengths /= np.max(lengths)
-				self.quiver_axes.quiver(self.X, self.Y, self.U, self.V, lengths, units='xy', width=0.15)
-			else:
-				self.quiver_axes.quiver(self.X, self.Y, self.U, self.V, units='xy', width=0.15)
+		self.quiver_axes.cla()
 
-			plt.show() 
+		if is_color:
+			lengths = self.field_magnitude
+			lengths /= np.max(lengths)
+			self.quiver_axes.quiver(self.X, self.Y, self.U, self.V, lengths, units='xy', width=0.15)
+		else:
+			self.quiver_axes.quiver(self.X, self.Y, self.U, self.V, units='xy', width=0.15)
+
+		plt.show()
+		self.quiver_axes = None
 
 
 
@@ -133,5 +130,6 @@ if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après
 
 	U, V = field.create_single_charge_field_components()
 	field.assign_field_components(U, V)
+	field.display(is_color=True)
 	field.display(is_color=False)
 
