@@ -125,7 +125,7 @@ class VectorField2D:
 
 
 if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après une classe
-	field = VectorField2D(size=20, N=19)
+	field = VectorField2D(size=20, N=9)
 	field.display() # Le défaut est un champ en sinus et cosinus
 
 	U, V = field.create_single_charge_field_components()
