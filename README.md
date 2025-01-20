@@ -9,9 +9,9 @@ Du code réalisé par Louis Archambault pour vous donner des exemples de ce qui 
 
 ## Semaine-02 :
 
-Du code réalisé par [Daniel C. Côté](https://github.com/dccote) pour vous guider pas à pas et vous montrer une progression dans un code qui commence très simplement et qui s'améliore itérativement. J'ai bien l'intention de continuer à améliorer ce code chaque semaine. Lisez les fichiers dans l'ordre des numéros pour bien suivre la progression.
+Du code réalisé par [Daniel C. Côté](https://github.com/dccote) pour vous guider pas à pas et vous montrer une progression dans un code qui commence très simplement et qui s'améliore itérativement. J'ai bien l'intention de continuer à améliorer ce code chaque semaine. Lisez les fichiers dans l'ordre des numéros pour bien suivre la progression ou utiliser le Notebook `Visualisation.ipynb`:
 
-* **Visualisation.ipynb** : un notebook facile à utiliser pour les débutants. Si vous avez Jupyter sur votre ordinateur (`pip install notebook`), lancez simplement `jupyter notebook`. Sinon, cliquez sur ce lien pour [l'exécuter sur Google Colab](https://colab.research.google.com/github/dccote/PHY-1007/blob/master/Semaine-02/Visualisation.ipynb).
+* **Visualisation.ipynb** : un notebook facile à utiliser pour les débutants qui génère le code des fichiers `.py`. Si vous avez Jupyter sur votre ordinateur (`pip install notebook`), lancez simplement `jupyter notebook`. ou ouvrez Visualisation.ipynb Sinon, cliquez sur ce lien pour [l'exécuter  directement et simplement sur Google Colab](https://colab.research.google.com/github/dccote/PHY-1007/blob/master/Semaine-02/Visualisation.ipynb).
 
 * **01 à 05 :** Vous avez ici le code Python le plus simple pour afficher une flèche sur un graphique et, à la fin, du code qui affiche un champ dans le plan. Pour du code procédural, c'est ce qu'on peut faire de mieux pour générer un graphique en peu de lignes. Vous verrez que le code nécessite malgré tout une gestion triviale de différents aspects et, en dépit de sa simplicité, reste assez difficile à réutiliser : il faut essentiellement recopier le code.
 
