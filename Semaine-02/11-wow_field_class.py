@@ -74,7 +74,7 @@ class SurfaceDomain:
 class VectorField2D:
 	def __init__(self, surface=None, U=None, V=None):
 		"""
-		On accepte le surface ou on en crée un par défaut. L'utilisteur peut
+		On accepte la surface ou on en crée une par défaut. L'utilisteur peut
 		fournir les composantes d'un champ U, V mais sinon, le champ est
 		initialisé à 0,0 partout.
 		"""
