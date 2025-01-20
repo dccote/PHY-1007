@@ -159,9 +159,12 @@ class VectorField2D:
 			percentile_90th = np.percentile(lengths, 90)
 			colors = np.clip(lengths, a_min=percentile_10th, a_max=percentile_90th)
 
-			self.quiver_axes.quiver(X, Y, self.U/lengths, self.V/lengths, colors, units='xy', width=0.10)
+			# Et finalement, j'ai compris que les unités du champ sont plus simple 
+			# lorsqu'on prend relatif a la grandeur du graphique: la largeur
+			# de la fleche sera aussi mieux adaptée independamment des unités.
+			self.quiver_axes.quiver(X, Y, self.U/lengths, self.V/lengths, colors)
 		else:
-			self.quiver_axes.quiver(X, Y, self.U, self.V, units='xy', width=0.10)
+			self.quiver_axes.quiver(X, Y, self.U, self.V)
 
 		plt.title(title)
 		plt.show()
