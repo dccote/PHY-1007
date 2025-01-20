@@ -14,11 +14,11 @@ class SurfaceDomain:
 		self._X = X # Lorsqu'on utilise _ devant une variable, c'est une convention de ne pas l'appeler directement
 		self._Y = Y # et d'utiliser les @property accessors
 
-	def xy_mesh(self, xo=0, yo=0):
-		return self._X-xo, self._Y-yo
+	def xy_mesh(self):
+		return self._X, self._Y
 
-	def rphi_mesh(self, xo=0, yo=0):
-		X,Y = self.xy_mesh(xo, yo)
+	def rphi_mesh(self):
+		X,Y = self.xy_mesh()
 		return np.sqrt(X*X+Y*Y), np.arctan2(Y, X)
 
 	def create_square_meshgrid(self, size=20, N=19):
@@ -56,16 +56,16 @@ class VectorField2D:
 		X,Y = self.domain.xy_mesh()
 		return np.sin(X/2), np.cos(Y/2)
 
-	def create_single_charge_field_components(self, xo=0, yo=0, q=1):
+	def create_single_charge_field_components(self):
 
 		# On pourra se retrouver, parfois, avec R==0 (a l'origin), et donc 1/(R*R)
 		# sera infini. On veut éviter les infinités et les discontinuités.
 		# Pour l'instant, pour simplifer, je vais simplement ajouter un tout
 		# petit 0.01 a R*R pour eviter que cela donne une division par zero.
 		# C'est affreux, mais ca évite les problèmes.
-		R, PHI = self.domain.rphi_mesh(xo, yo)
+		R, PHI = self.domain.rphi_mesh()
 
-		return q*np.cos(PHI)/(R*R+0.01), q*np.sin(PHI)/(R*R+0.01)
+		return np.cos(PHI)/(R*R+0.01), np.sin(PHI)/(R*R+0.01)
 
 	def validate_arrays(self):
 		if self.U is None or self.V is None:
@@ -102,11 +102,10 @@ class VectorField2D:
 		self.quiver_axes = None
 
 if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après une classe
-	domain=SurfaceDomain(size=20, N=19)
-	field = VectorField2D(surface=domain) # Le domaine par défaut est -10 a 10 avec 19 points par dimension
+	field = VectorField2D() # Le domaine par défaut est -10 a 10 avec 19 points par dimension
 
-	U, V = field.create_single_charge_field_components(xo=3, yo=0, q=1)
+	U, V = field.create_single_charge_field_components()
 	field.add_field_components(U, V)
-	U, V = field.create_single_charge_field_components(xo=-3, yo=0, q=1)
+	U, V = field.create_single_charge_field_components()
 	field.add_field_components(U, V)
 	field.display(use_color=True)

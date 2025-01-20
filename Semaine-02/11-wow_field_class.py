@@ -1,29 +1,5 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
-
-
-"""
-Je trouve que les couleurs ne sont pas terribles: puisqu'il y a souvent des
-valeurs tres grandes (i.e. infinies) a l'origine des charges, toutes les
-petites valeurs se retrouvent de la meme couleur.  Je vais plutot limiter les
-valeurs entre le 10e et 90e percentile au lieu de normaliser sur la valeur
-maximale.
-
-De plus, on voit que maintenant j'appelle les fonctions comme suit:
-
-    U, V = field.create_single_charge_field_components(xo=3, yo=0, q=1)
-    field.add_field_components(U, V)
-
-donc je crois qu'il est plus simple de créer une nouvelle fonction
-qui fera tout d'un seul appel de fonction:
-
-    field.add_single_charge(xo=3, yo=0, q=1)
-
-Je garde quand même les anciennes fonctions, car je ne suis pas certain si je
-vais le réutiliser. Cependant, j'enleve le champ par defaut en sinus et
-cosinus que j'avais utilisé depuis le debut.
-
-"""
 
 class SurfaceDomain:
     def __init__(self, size=20, N=19, X=None, Y=None):
@@ -41,12 +17,12 @@ class SurfaceDomain:
             raise ValueError("Les composantes X et Y doivent avoir le meme nombre d'éléments")
 
         self._X = X # Lorsqu'on utilise _ devant une variable, c'est une convention de ne pas l'appeler directement
-        self._Y = Y # et d'utiliser les @property accessors
+        self._Y = Y # et d'utiliser les @property accessors ou les fonctions
 
     def xy_mesh(self, xo=0, yo=0):
         """
         Les np.arrays X,Y du meshgrid, mais relatif à l'origine (xo, yo).
-        Ceci permet d'utiliser directement les valeurs pour le calcul du 
+        Ceci permet d'utiliser directement les valeurs pour le calcul du
         champ d'une charge unique.
 
         Par défaut, l'origine est à (0,0)
@@ -56,13 +32,13 @@ class SurfaceDomain:
     def rphi_mesh(self, xo=0, yo=0):
         """
         Les np.arrays R,PHI du meshgrid, mais relatif à l'origine (xo, yo).
-        Ceci permet d'utiliser directement les valeurs pour le calcul du 
+        Ceci permet d'utiliser directement les valeurs pour le calcul du
         champ d'une charge unique.
 
         Par défaut, l'origine est à (0,0)
         """
         X,Y = self.xy_mesh(xo, yo)
-        return np.sqrt(X*X+Y*Y), np.atan2(Y, X)
+        return np.sqrt(X*X+Y*Y), np.arctan2(Y, X)
 
     def create_square_meshgrid(self, size=20, N=19):
         """
@@ -99,13 +75,13 @@ class VectorField2D:
     def field_magnitude(self):
         return np.sqrt(self.U*self.U+self.V*self.V)
 
-    def create_null_field_components(self):     
+    def create_null_field_components(self):
         X,Y = self.domain.xy_mesh()
         return X*0, X*0 # C'est un truc pour avoir rapidement une liste de la meme longueur avec des zeros
 
     def create_single_charge_field_components(self, xo=0, yo=0, q=1):
 
-        # On pourra se retrouver, parfois, avec R==0 (a l'origin), et donc 1/(R*R) 
+        # On pourra se retrouver, parfois, avec R==0 (a l'origin), et donc 1/(R*R)
         # sera infini. On veut éviter les infinités et les discontinuités.
         # Pour l'instant, pour simplifer, je vais simplement ajouter un tout
         # petit 0.01 a R*R pour eviter que cela donne une division par zero.
@@ -153,17 +129,17 @@ class VectorField2D:
             lengths = self.field_magnitude
 
             # Les couleurs sont biaisées car il y a souvent des valeurs tres grandes.
-            # PLutot que de normaliser sur la plus grande valeurs, je limite 
-            # les valeurs entre les percentiles 10-90 et je normalise la longueur des fleches. 
+            # PLutot que de normaliser sur la plus grande valeurs, je limite
+            # les valeurs entre les percentiles 10-90 et je normalise la longueur des fleches.
             # Ca fait plus beau.
             percentile_10th = np.percentile(lengths, 10)
             percentile_90th = np.percentile(lengths, 90)
             colors = np.clip(lengths, a_min=percentile_10th, a_max=percentile_90th)
 
-            # Et finalement, j'ai compris que les unités du champ sont plus simple 
+            # Et finalement, j'ai compris que les unités du champ sont plus simple
             # lorsqu'on prend relatif a la grandeur du graphique: la largeur
             # de la fleche sera aussi mieux adaptée independamment des unités.
-            self.quiver_axes.quiver(X, Y, self.U/lengths, self.V/lengths, colors)
+            self.quiver_axes.quiver(X, Y, self.U/lengths, self.V/lengths, colors, cmap="viridis_r")
         else:
             self.quiver_axes.quiver(X, Y, self.U, self.V)
 
@@ -171,7 +147,6 @@ class VectorField2D:
         plt.title(title)
         plt.show()
         self.quiver_axes = None
-
 
 if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après une classe
     single_charge_field = VectorField2D() # Le domaine par défaut est -10 a 10 avec 19 points par dimension
@@ -187,3 +162,11 @@ if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après
     dipole_field.add_single_charge(xo=5, yo=0, q=1)
     dipole_field.add_single_charge(xo=-5, yo=0, q=-1)
     dipole_field.display(use_color=True, title="Dipole")
+
+    domain=SurfaceDomain(size=20, N=39)
+    quadrupole_field = VectorField2D(domain)
+    quadrupole_field.add_single_charge(xo=5, yo=5, q=1)
+    quadrupole_field.add_single_charge(xo=-5, yo=5, q=-1)
+    quadrupole_field.add_single_charge(xo=5, yo=-5, q=-1)
+    quadrupole_field.add_single_charge(xo=-5, yo=-5, q=1)
+    quadrupole_field.display(use_color=True, title="Quadrupole")

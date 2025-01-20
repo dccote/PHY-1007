@@ -1,31 +1,5 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
-
-
-"""
-Nous voulons continuer d'améliorer la classe pour faciliter son usage et surtout la rendre plus flexible.
-Nous allons créer des méthodes qui vont nous permettre d'éviter de modifier les variables directement
-et nous allons tenter d'ajouter une façon de mieux utiliser le graphique.
-
-Pour ce faire, nous allons ajouter des méthodes qui modifient les variables, et qui nous aident à créer
-des champs ou des coordonnées.
-
-Nous gardons aussi la figure qui est créée par plt.quiver() et nous pourrons la modifier si necessaire.
-Dans matplotlib, une figure s'appelle des "axes".  Je n'ai pas inventé le nom.
-
-Nous pouvons utiliser le code de facon un peu plus simple:
-
-```
-	field = VectorField2D(size=20)
-	field.display() # Le défaut est un champ en sinus et cosinus
-
-	X,Y = field.xy_mesh()
-	field.assign_field_components(U = X/10, V = Y*Y/100)
-	field.display()
-
-```
-
-"""
 
 class VectorField2D:
 	def __init__(self, size=None, X=None, Y=None, U=None, V=None):
@@ -93,10 +67,7 @@ class VectorField2D:
 
 			lengths = np.sqrt(self.U*self.U+self.V*self.V)
 			self.quiver_axes = plt.quiver(self.X, self.Y, self.U, self.V, lengths)
-			plt.show() 
-
-
-
+			plt.show()
 
 if __name__ == "__main__": # C'est la facile rigoureuse d'ajouter du code après une classe
 	field = VectorField2D(size=20)
@@ -105,4 +76,3 @@ if __name__ == "__main__": # C'est la facile rigoureuse d'ajouter du code après
 	X,Y = field.xy_mesh()
 	field.assign_field_components(U = X/10, V = Y*Y/100)
 	field.display()
-

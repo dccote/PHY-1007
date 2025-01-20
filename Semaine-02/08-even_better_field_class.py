@@ -1,20 +1,5 @@
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
-
-
-"""
-Vous pouvez arreter a tout moment de lire les améliorations pour la classe si vous les trouvez trop 
-difficile à comprendre.
-
-J'aimerais pouvoir rapidement changer le champ de facon efficace:
-
-field = VectorField()
-field.create_single_charge_field_components()
-
-On remarquera que le champ d'une charge varie rapidement, donc l'utilisation de la longueur de la fleche
-pour représenter le champ devient problématique car c'est parfois trop long, ou c'est essentiellement nul
-et on ne voit rien. J'ajoute une option pour voir le logarithme de la longueur.
-"""
 
 class VectorField2D:
 	def __init__(self, size=None, N=19, X=None, Y=None, U=None, V=None):
@@ -46,7 +31,7 @@ class VectorField2D:
 	@property
 	def rphi_mesh(self):
 		X,Y = self.xy_mesh
-		return np.sqrt(X*X+Y*Y), np.atan2(Y, X)
+		return np.sqrt(X*X+Y*Y), np.arctan2(Y, X)
 
 	@property
 	def field_magnitude(self):
@@ -61,7 +46,7 @@ class VectorField2D:
 		y = np.linspace(-size/2,size/2, N)
 		return np.meshgrid(x,y)
 
-	def create_null_field_components(self):		
+	def create_null_field_components(self):
 		X,Y = self.xy_mesh
 		return X*0, X*0 # C'est un truc pour avoir rapidement une liste de la meme longueur avec des zeros
 
@@ -132,4 +117,3 @@ if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après
 	field.assign_field_components(U, V)
 	field.display(is_color=True)
 	field.display(is_color=False)
-
