@@ -114,9 +114,9 @@ class VectorField2D:
 		if is_color:
 			lengths = self.field_magnitude
 			lengths /= np.max(lengths)
-			self.quiver_axes.quiver(self.X, self.Y, self.U, self.V, lengths, units='xy', width=0.15)
+			self.quiver_axes.quiver(self.X, self.Y, self.U, self.V, lengths)
 		else:
-			self.quiver_axes.quiver(self.X, self.Y, self.U, self.V, units='xy', width=0.15)
+			self.quiver_axes.quiver(self.X, self.Y, self.U, self.V)
 
 		plt.show()
 		self.quiver_axes = None

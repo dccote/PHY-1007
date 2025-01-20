@@ -32,8 +32,8 @@ lengths = np.sqrt(U*U+V*V) # Le 5e argument (0 à 1) donne la couleur selon la c
 
 plt.tick_params(direction="in")
 
-plt.quiver(X, Y, U, V, lengths, units='xy', scale=1, width=0.15) # On peut changer la couleur avec la longueur
-# plt.quiver(X, Y, U, V, lengths, units='xy', cmap=cm.inferno, scale=1, width=0.15) # Si vous êtes un artiste
-# plt.quiver(X, Y, U, V, lengths, units='xy', cmap=cm.hsv, scale=1, width=0.15) # Si vous voulez choquer Louis
+plt.quiver(X, Y, U, V, lengths) # On peut changer la couleur avec la longueur
+# plt.quiver(X, Y, U, V, lengths, cmap=cm.inferno) # Si vous êtes un artiste
+# plt.quiver(X, Y, U, V, lengths, cmap=cm.hsv) # Si vous voulez choquer Louis
 
 plt.show() 

@@ -20,7 +20,7 @@ V = np.cos(Y/2)
 
 lengths = np.sqrt(U*U+V*V)
 plt.tick_params(direction="in")
-plt.quiver(X, Y, U, V, lengths, units='xy', scale=1, width=0.15)
+plt.quiver(X, Y, U, V, lengths)
 plt.show() 
 ```
 
@@ -81,7 +81,7 @@ class VectorField2D:
 		plt.tick_params(direction="in")
 
 		lengths = np.sqrt(self.U*self.U+self.V*self.V)
-		plt.quiver(self.X, self.Y, self.U, self.V, lengths, units='xy', scale=1, width=0.15)
+		plt.quiver(self.X, self.Y, self.U, self.V, lengths)
 		plt.show() 
 
 

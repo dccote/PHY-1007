@@ -92,7 +92,7 @@ class VectorField2D:
 			self.quiver_axes.tick_params(direction="in")
 
 			lengths = np.sqrt(self.U*self.U+self.V*self.V)
-			self.quiver_axes = plt.quiver(self.X, self.Y, self.U, self.V, lengths, units='xy', scale=1, width=0.15)
+			self.quiver_axes = plt.quiver(self.X, self.Y, self.U, self.V, lengths)
 			plt.show() 
 
 

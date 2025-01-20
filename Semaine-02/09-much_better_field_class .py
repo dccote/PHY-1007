@@ -98,7 +98,7 @@ class VectorField2D:
 
 		self.quiver_axes = None # Nous avons changé le champ, la figure n'est plus valide
 
-	def display(self, use_color=True, **quiver_kwargs):
+	def display(self, use_color=True):
 		self.validate_arrays()
 
 		if self.quiver_axes is None:
@@ -111,9 +111,9 @@ class VectorField2D:
 
 		if use_color:
 			lengths = self.field_magnitude
-			self.quiver_axes.quiver(X, Y, self.U/lengths, self.V/lengths, lengths, units='xy', width=0.10, *quiver_kwargs)
+			self.quiver_axes.quiver(X, Y, self.U/lengths, self.V/lengths, lengths)
 		else:
-			self.quiver_axes.quiver(X, Y, self.U, self.V, units='xy', width=0.05, *quiver_kwargs)
+			self.quiver_axes.quiver(X, Y, self.U, self.V)
 
 		plt.show()
 		self.quiver_axes = None
