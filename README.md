@@ -1,25 +1,18 @@
 # PHY-1007
-Code associé au cours de PHY-1007: Électromagnétisme à l'Université Laval. Le répertoire est séparé en `Semaine-XX` pour s'arrimer au [site Web du cours PHY-1007](https://sitescours.monportail.ulaval.ca/ena/site/accueil?idSite=174289&idPage=4617116).
+Code associé au cours PHY-1007 : Électromagnétisme à l'Université Laval. Le répertoire est organisé en `Semaine-XX` pour s'arrimer au [site Web du cours PHY-1007](https://sitescours.monportail.ulaval.ca/ena/site/accueil?idSite=174289&idPage=4617116).
 
-Pour commencer, les exemples demandent simplement de savoir le noms de commandes pour faire des graphiques (champ scalaire, vectoriel, etc...).
+Pour commencer, les exemples demandent simplement de connaître les noms des commandes pour créer des graphiques (champs scalaires, vectoriels, etc.).
 
-## Semaine-01: 
+## Semaine-01 : 
 
-Du code fait par Louis Archambault pour vous donnez des exemples de ce qui est possible comme visualisation.
+Du code réalisé par Louis Archambault pour vous donner des exemples de ce qui est possible en termes de visualisation.
 
-## Semaine-02
+## Semaine-02 :
 
-Du code fait par [Daniel C. Côté](https://github.com/dccote) pour vous prendre par la main et vous montrer la progression dans du code qui commence très simplement et qui itérativement s'améliore. J'ai bien l'intention de continuer à améliorer ce code à chaque semaine.  Lisez les fichiers en ordre de numéro pour bien suivre la progression.
+Du code réalisé par [Daniel C. Côté](https://github.com/dccote) pour vous guider pas à pas et vous montrer une progression dans un code qui commence très simplement et qui s'améliore itérativement. J'ai bien l'intention de continuer à améliorer ce code chaque semaine. Lisez les fichiers dans l'ordre des numéros pour bien suivre la progression.
 
-* **01à 05:** Vous avez donc le plus simple code Python pour afficher une fleche sur un graphique et a la fin, du code qui affiche un champ dans le plan. Pour du code procédural, c'est le mieux qu'on puisse faire pour faire un graphique en peu de ligne. Vous verrez que le code demande quand même un peu de gestion trivial de différents aspects et malgré tout, reste suffisamment difficile reutilisable: il faut essentiellement recopier le code.
+* **Visualisation.ipynb** : un notebook facile à utiliser pour les débutants. Si vous avez Jupyter sur votre ordinateur (`pip install notebook`), lancez simplement `jupyter notebook`. Sinon, cliquez sur ce lien pour [l'exécuter sur Google Colab](https://colab.research.google.com/github/dccote/PHY-1007/blob/master/Semaine-02/Visualisation.ipynb).
 
-* **06-??:** Pour pouvoir mieux réutiliser le code, la solution est de faire une classe qui encaspule les détails et les gère. Vous verrez une utilisation de code "orienté-objet" pour faire des classes et simplifier l'utilisation à long terme dans d'autres projet. Je vais continuer de faire le code tout au long de la fin de semaine.
+* **01 à 05 :** Vous avez ici le code Python le plus simple pour afficher une flèche sur un graphique et, à la fin, du code qui affiche un champ dans le plan. Pour du code procédural, c'est ce qu'on peut faire de mieux pour générer un graphique en peu de lignes. Vous verrez que le code nécessite malgré tout une gestion triviale de différents aspects et, en dépit de sa simplicité, reste assez difficile à réutiliser : il faut essentiellement recopier le code.
 
-
-calculer le champ provenant d'une collections de sources discrètes ou continues dans le système de coordonnées appropriés 
-
-évaluer les limites pour vérifier ses calculs, par exemple le champ loin d'un groupe de source
-
-calculer la divergence et e flux d'un champ électrique pour des situations
-
-savoir appliquer le théorème de Gauss 
+* **06 à 11 :** Pour mieux réutiliser le code, la solution consiste à créer une classe qui encapsule les détails et les gère. Vous verrez une utilisation de la programmation orientée objet pour créer des classes et simplifier l'utilisation à long terme dans d'autres projets. Je vais continuer à développer ce code tout au long de la fin de semaine.
