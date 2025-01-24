@@ -20,24 +20,8 @@ class SurfaceDomain:
         if len(X) != len(Y):
             raise ValueError("Les composantes X et Y doivent avoir le meme nombre d'éléments")
 
-        self._X = X # Lorsqu'on utilise _ devant une variable, c'est une convention de ne pas l'appeler directement
-        self._Y = Y # et d'utiliser les @property accessors ou les fonctions
-
-    @property
-    def X(self):
-        return self._X
-
-    @X.setter
-    def X(self, value):
-        self._X = value
-
-    @property
-    def Y(self):
-        return self._Y
-
-    @Y.setter
-    def Y(self, value):
-        self._Y = value
+        self.X = X 
+        self.Y = Y # et d'utiliser les @property accessors ou les fonctions
 
     def xy_mesh(self, xo=0, yo=0):
         """
@@ -84,7 +68,9 @@ class SurfaceDomain:
 
     def create_polar_meshgrid(self, radius=20, M=5, N=36):
         """
-        Fonction pour créer un domaine XY rapidement
+        Fonction pour créer un domaine XY a symétrie polaire rapidement
+        On conserve quand meme tout dans les vecteurs X et Y, mais la 
+        symétrie sera polaire.
         """
         r = np.linspace(radius/M, radius, M)
         phi = np.linspace(0, 2*np.pi, N)
@@ -143,8 +129,8 @@ class VectorField2D:
         On identifie les valeurs U et V qui sont valides, et on assigne
         seulement ces indices avec:self.U[u_valid] += ...
         """
-        u_valid = np.logical_not(np.logical_or(np.isinf(U),np.isnan(U)))
-        v_valid = np.logical_not(np.logical_or(np.isinf(V),np.isnan(V)))
+        u_valid = np.isfinite(U)
+        v_valid = np.isfinite(V)
 
         self.U[u_valid] += U[u_valid]
         self.V[v_valid] += V[v_valid]
