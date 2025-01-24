@@ -5,7 +5,6 @@ x = np.linspace(-1,1,9) # 9 valeurs différentes entre -1 et 1
 y = np.linspace(-1,1,9) # 9 valeurs différentes entre -1 et 1
 X,Y = np.meshgrid(x,y)  # Les 81 combinaisons possibles pour former la grille
 
-
 U = np.sin(2*X)
 V = np.cos(2*Y)
 
