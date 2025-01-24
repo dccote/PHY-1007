@@ -144,8 +144,9 @@ class VectorField2D:
         seulement ces indices avec:self.U[u_valid] += ...
         """
         u_valid = np.logical_not(np.logical_or(np.isinf(U),np.isnan(U)))
-        self.U[u_valid] += U[u_valid]
         v_valid = np.logical_not(np.logical_or(np.isinf(V),np.isnan(V)))
+
+        self.U[u_valid] += U[u_valid]
         self.V[v_valid] += V[v_valid]
         self.validate_arrays()
 
