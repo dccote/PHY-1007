@@ -20,24 +20,8 @@ class SurfaceDomain:
         if len(X) != len(Y):
             raise ValueError("Les composantes X et Y doivent avoir le meme nombre d'éléments")
 
-        self._X = X # Lorsqu'on utilise _ devant une variable, c'est une convention de ne pas l'appeler directement
-        self._Y = Y # et d'utiliser les @property accessors ou les fonctions
-
-    @property
-    def X(self):
-        return self._X
-
-    @X.setter
-    def X(self, value):
-        self._X = value
-
-    @property
-    def Y(self):
-        return self._Y
-
-    @Y.setter
-    def Y(self, value):
-        self._Y = value
+        self.X = X 
+        self.Y = Y # et d'utiliser les @property accessors ou les fonctions
 
     def xy_mesh(self, xo=0, yo=0):
         """
@@ -69,7 +53,7 @@ class SurfaceDomain:
         self.X, self.Y = self.create_square_meshgrid(size, N)
 
     def set_polar_meshgrid(self, radius=20, M=5, N=36):
-        """
+        """_f
         Fonction pour assigner un domaine RPHI rapidement
         """
         self.X, self.Y = self.create_polar_meshgrid(radius, M, N)
@@ -84,7 +68,9 @@ class SurfaceDomain:
 
     def create_polar_meshgrid(self, radius=20, M=5, N=36):
         """
-        Fonction pour créer un domaine XY rapidement
+        Fonction pour créer un domaine XY a symétrie polaire rapidement
+        On conserve quand meme tout dans les vecteurs X et Y, mais la 
+        symétrie sera polaire.
         """
         r = np.linspace(radius/M, radius, M)
         phi = np.linspace(0, 2*np.pi, N)
@@ -228,11 +214,23 @@ class VectorField2D:
         plt.show()
         self.quiver_axes = None
 
+    def display_field_strength(self, title=None):
+        self.validate_arrays()
+
+        strengths = self.field_magnitude
+        
+        percentile_10th = np.percentile(strengths, 10)
+        percentile_90th = np.percentile(strengths, 90)
+
+        plt.imshow(strengths, vmin=percentile_10th, vmax=percentile_90th, cmap='viridis')
+        plt.title(title)
+        plt.show()
+
 if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après une classe
     single_charge_field = VectorField2D() # Le domaine par défaut est -10 a 10 avec 19 points par dimension
     single_charge_field.add_single_charge(xo=0, yo=0, q=1)
     single_charge_field.display(use_color=True, title="Une seule charge")
-
+    
     two_charges_field = VectorField2D()
     two_charges_field.add_single_charge(xo=5, yo=0, q=1)
     two_charges_field.add_single_charge(xo=-5, yo=0, q=1)
