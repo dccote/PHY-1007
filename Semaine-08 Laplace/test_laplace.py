@@ -8,6 +8,7 @@ try:
 	import pyopencl as cl
 	import pyopencl.array as cl_array
 except:
+	print("OpenCL not available. On Linux: sudo apt-get install python-pyopencl seems to work (Ubuntu ARM64 macOS).")
 	cl = None
 	cl_array = None
 
@@ -330,7 +331,7 @@ class ArrayManipulationTestCase(unittest.TestCase):
 
 
 @unittest.skipIf(cl is None, "PyOpenCL is not installed.")
-class OpenCLArray(unittest.TestCase):
+class OpenCLArrayTestCase(unittest.TestCase):
 	def test01_2Dopencl(self):
 		"""
 		Les calculs de Laplace par la relaxation sont facile à mettre en place sur GPU
@@ -410,8 +411,8 @@ class OpenCLArray(unittest.TestCase):
 					break
 				stds.append(std_val)
 
-		plt.title(f"{self._testMethodName}: Error vs iteration")
 		plt.clf()
+		plt.title(f"{self._testMethodName}: Error vs iteration")
 		plt.plot(stds)
 		plt.pause(0.1)
 
@@ -427,7 +428,6 @@ class OpenCLArray(unittest.TestCase):
 		size = d*w*h
 		host_array = np.zeros(shape=(d, h, w), dtype=np.float32)
 		host_array[0,:,:] = 10
-		converged = np.zeros(shape=(d, h, w), dtype=np.bool)
 
 		# Get OpenCL platform and device
 		platform = cl.get_platforms()[0]  # Select first platform
