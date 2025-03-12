@@ -303,10 +303,10 @@ class ArrayManipulationTestCase(unittest.TestCase):
 		self.set_initial_condition3D(v)
 		self.solve_laplace3D_by_relaxation(v, initial_condition=self.set_initial_condition3D)
 
-		print(f"\nCPU, 2D single grid {v.shape}: {time.time()-start_time:.3f}")
+		print(f"\nCPU, 3D single grid {v.shape}: {time.time()-start_time:.3f}")
 
-		plt.title(f"{self._testMethodName}: 3D + Depth")
-		for i in range(v.shape[0]):
+		for i in range(v.shape[0], 10):
+			plt.title(f"{self._testMethodName}: 3D layer={i}")
 			plt.imshow(v[i,:,:])
 			plt.pause(0.1)
 
@@ -326,13 +326,12 @@ class ArrayManipulationTestCase(unittest.TestCase):
 		raffinant la resolution a chaque fois.
 
 		"""
-		v = np.zeros( (30,30), dtype=np.float32)
+		v = np.zeros( (32,32), dtype=np.float32)
 		
 		start_time = time.time()
 		with plt.ioff():
-			for i in range(4):
+			for i in range(2):
 				v = zoom(v, 2, order=0)
-				print(f"Iteration {i}, {v.shape}")
 				self.set_initial_condition(v)
 				self.solve_laplace2D_by_relaxation(v, initial_condition=self.set_initial_condition)
 				plt.title(f"{self._testMethodName} : # {i} {v.shape}")
@@ -681,6 +680,6 @@ class OpenCLArrayTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
 	# unittest.main(defaultTest=["OpenCLArrayTestCase.test05_laplace2d_grid_refinement","OpenCLArrayTestCase.test01_2Dopencl","ArrayManipulationTestCase.test12_laplace_with_finer_and_finer_grid","ArrayManipulationTestCase.test10_laplace_initial_condition_fct"])
-	unittest.main(defaultTest=["OpenCLArrayTestCase"])
+	unittest.main()
 
 
