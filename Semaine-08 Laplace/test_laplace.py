@@ -165,7 +165,7 @@ class ArrayManipulationTestCase(unittest.TestCase):
 
 		error = None
 		iteration = 0
-		while error is None or error > 1e-7:
+		while error is None or error > 1e-5:
 			before_iteration = a.copy()
 			a[1:-1,1:-1] = (a[:-2,1:-1]+ a[2:,1:-1]+ a[1:-1,:-2]+ a[1:-1,2:])/4
 			error = np.std( a-before_iteration)
@@ -175,7 +175,7 @@ class ArrayManipulationTestCase(unittest.TestCase):
 				plt.pause(0.1)
 			iteration += 1
 
-	def solve_laplace2D_by_relaxation(self, v, initial_condition=None, tolerance=1e-7):
+	def solve_laplace2D_by_relaxation(self, v, initial_condition=None, tolerance=1e-5):
 		""" Ceci n'est pas un test: j'ecris une fonction qui me permettra de solutionner
 		pour n'importe quelle matrice et n'importer quelle conditions aux limites.
 
@@ -191,6 +191,7 @@ class ArrayManipulationTestCase(unittest.TestCase):
 				initial_condition(v)
 
 			error = np.std(v - before_iteration)
+
 		return v
 
 	def test09_define_slices(self):
@@ -268,7 +269,7 @@ class ArrayManipulationTestCase(unittest.TestCase):
 		right = slice(2, None) # [2:  ]
 
 		iteration = 0
-		while error is None or error > 1e-7:
+		while error is None or error > 1e-5:
 			if iteration % 20 == 0:
 				before_iteration = v.copy()
 			v[center, center, center] = (v[left,center,center] + v[center, left,center] + v[center, center, left]+v[right,center,center] + v[center, right,center] + v[center, center, right])/6
@@ -314,12 +315,12 @@ class ArrayManipulationTestCase(unittest.TestCase):
 		raffinant la resolution a chaque fois.
 
 		"""
-		v = np.zeros( (20,20), dtype=np.float32)
+		v = np.zeros( (30,30), dtype=np.float32)
 		
 		start_time = time.time()
 		with plt.ioff():
-			for i in range(4):
-				v = zoom(v, 2, order=1)
+			for i in range(3):
+				v = zoom(v, 2, order=0)
 				print(f"Iteration {i}, {v.shape}")
 				self.set_initial_condition(v)
 				self.solve_laplace2D_by_relaxation(v, initial_condition=self.set_initial_condition)
@@ -327,15 +328,15 @@ class ArrayManipulationTestCase(unittest.TestCase):
 				plt.imshow(v)
 				plt.pause(0.1)
 
-		print(f"Run time {self._testMethodName}: {time.time()-start_time:.3f}")
+		print(f"CPU, with refinement: {time.time()-start_time:.3f}")
 
 
 @unittest.skipIf(cl is None, "PyOpenCL is not installed.")
 class OpenCLArrayTestCase(unittest.TestCase):
 	def test01_2Dopencl(self):
 		"""
-		Les calculs de Laplace par la relaxation sont facile à mettre en place sur GPU
-		car on refait le même calcul à répétition.
+		Les calculs de Laplace par la relaxation sont faciles à mettre en place sur GPU
+		car on refait le même calcul à répétition pour chaque element de la matrice.
 
 		Je n'ai pas verifie la validite du resultat: je devrais faire le calcul en Python pur,
 		ensuite le refaire sur GPU et montrer que les valeurs sont les memes, mais ce n'est pas encore fait.
@@ -351,7 +352,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
 		import pyopencl.array as cl_array
 
 		# Define a 2D array (float32)
-		h, w = 100,100
+		h, w = 240,240
 		size = h*w
 		host_array = np.zeros(shape=(h, w), dtype=np.float32)
 		host_array[0,:] = 10 # Initial conditions
@@ -389,6 +390,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
 		# Set up the execution parameters
 		global_size = (w, h)  # Matches the 2D array size
 
+		start_time = time.time()
 		stds = []
 		plt.clf()
 		for i in range(5000):
@@ -407,9 +409,11 @@ class OpenCLArrayTestCase(unittest.TestCase):
 				max_val = cl_array.max(d_diff).get() 
 				min_val = cl_array.min(d_diff).get() 
 				std_val = np.sqrt(variance_val)  # Standard deviation (final sqrt)
-				if std_val < 1e-9:
+				if std_val < 1e-5:
 					break
 				stds.append(std_val)
+
+		print(f"OpenCL, single grid: {time.time() - start_time:.3f} {host_array.shape}")
 
 		plt.clf()
 		plt.title(f"{self._testMethodName}: Error vs iteration")
@@ -463,7 +467,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
 		# Set up the execution parameters
 		global_size = (w,h,d)  # Matches the 2D array size
 
-		for i in range(1000):
+		for i in range(5000):
 			program.laplace3D(queue, global_size, None, d_input.data, d_output.data, np.int32(w), np.int32(h), np.int32(d))
 			# The calculation is sent to d_output, which I then use as the input for another iteration
 			# This way, d_input becomes the output and I do not have to create an array each time.  This is very efficient.
@@ -478,7 +482,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
 				max_val = cl_array.max(d_diff).get() 
 				min_val = cl_array.min(d_diff).get() 
 				std_val = np.sqrt(variance_val)  # Standard deviation (final sqrt)
-				if std_val < 1e-9:
+				if std_val < 1e-5:
 					break
 
 		# Retrieve results
@@ -489,17 +493,285 @@ class OpenCLArrayTestCase(unittest.TestCase):
 			plt.imshow(output_array[i,:,:])
 			plt.pause(0.1)
 
-	def setUp(self):
-		self.platform = cl.get_platforms()[0]  # Select first platform
-		self.device = self.platform.get_devices()[0]  # Select first device (GPU or CPU)
-		self.context = cl.Context([self.device])  # Create OpenCL context
-		self.queue = cl.CommandQueue(self.context)  # Create command queue
+	def test03_scale_numpyarray(self):
+		"""
+		Une des facons d'accelerer le calcul est de faire des raffinements successifs
+		de la resolution. Je vais tenter de coder cela sur le GPU
+				
+		"""
+
+		# Define a 3d array (float32)
+		h, w = 30,30
+		size = w*h
+		host_array = np.random.randint(0, 255, size=(h, w)).astype(np.float32)
+		host_dest = np.zeros(shape=(2*h, 2*w), dtype=np.float32)
+
+		# Get OpenCL platform and device
+		platform = cl.get_platforms()[0]  # Select first platform
+		device = platform.get_devices()[0]  # Select first device (GPU or CPU)
+		context = cl.Context([device])  # Create OpenCL context
+		queue = cl.CommandQueue(context)  # Create command queue
+
+		# Create OpenCL buffers
+		d_input = cl_array.to_device(queue, host_array)  # Copy data to GPU
+		d_output = cl_array.to_device(queue, host_dest)  # Create an empty GPU array
 
 
+		# Kernel program: Laplace in 3D
+		kernel_code = """
+		__kernel void zoom2D_nearest_neighbour(__global float* input, __global float* output, int width, int height) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
 
+		    int index_src = y * width + x;
+
+		    int index_dest1 = (2*y) * (2*width) + 2*x;
+		    int index_dest2 = (2*y) * (2*width) + 2*x + 1;
+		    int index_dest3 = (2*y) * (2*width) + 2*x + 2*width;
+		    int index_dest4 = (2*y) * (2*width) + 2*x + 2*width + 1;
+
+	    	output[index_dest1] = input[index_src];
+	    	output[index_dest2] = input[index_src];
+	    	output[index_dest3] = input[index_src];
+	    	output[index_dest4] = input[index_src];
+		}
+		"""
+
+		# Build the program
+		program = cl.Program(context, kernel_code).build()
+
+		# Set up the execution parameters
+		global_size = (w,h)  # Matches the 2D array size
+
+		program.zoom2D_nearest_neighbour(queue, global_size, None, d_input.data, d_output.data, np.int32(w), np.int32(h))
+
+		# Retrieve results
+		input_array = d_input.get()
+		output_array = d_output.get()
+
+		# Validate answer
+		expected_output_array = zoom(input_array, 2, order=0)
+
+		self.assertEqual(input_array.shape[0]*2, output_array.shape[0])
+		self.assertEqual(input_array.shape[1]*2, output_array.shape[1])
+
+		self.assertEqual(expected_output_array.shape[0], output_array.shape[0])
+		self.assertEqual(expected_output_array.shape[1], output_array.shape[1])
+
+		self.assertTrue( (expected_output_array == output_array).all())
+
+		plt.title(f"{self._testMethodName}")
+		plt.imshow(output_array)
+		plt.show()
+
+
+	def test04_scale_numpyarray_twice(self):
+		"""
+		Je valide que je peux facilement zoomer a repetition
+		"""
+
+		# Define a 3d array (float32)
+		h, w = 30,30
+		size = w*h
+		host_array = np.random.randint(0, 255, size=(h, w)).astype(np.float32)
+
+		# Get OpenCL platform and device
+		platform = cl.get_platforms()[0]  # Select first platform
+		device = platform.get_devices()[0]  # Select first device (GPU or CPU)
+		context = cl.Context([device])  # Create OpenCL context
+		queue = cl.CommandQueue(context)  # Create command queue
+
+		# Create OpenCL buffers
+		d_input = cl_array.to_device(queue, host_array)  # Copy data to GPU
+
+
+		# Kernel program: Laplace in 3D
+		kernel_code = """
+		__kernel void zoom2D_nearest_neighbour(__global float* input, __global float* output, int width, int height) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
+
+		    int index_src = y * width + x;
+
+		    int index_dest1 = (2*y) * (2*width) + 2*x;
+		    int index_dest2 = (2*y) * (2*width) + 2*x + 1;
+		    int index_dest3 = (2*y) * (2*width) + 2*x + 2*width;
+		    int index_dest4 = (2*y) * (2*width) + 2*x + 2*width + 1;
+
+	    	output[index_dest1] = input[index_src];
+	    	output[index_dest2] = input[index_src];
+	    	output[index_dest3] = input[index_src];
+	    	output[index_dest4] = input[index_src];
+		}
+
+		__kernel void copy(__global float* input, __global float* output, int width) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
+
+		    int index = y * width + x;
+
+	    	output[index] = input[index];
+		}
+
+		__kernel void laplace(__global float* input, __global float* output, int width) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
+		    int index = y * width + x;
+
+		    if (x == 0 || y == 0 || x == width-1 || y == width-1) {
+		    	output[index] = input[index]; // Boundary is fixed
+		    } else {
+				output[index] = (input[index-1] + input[index+1] + input[index-width] + input[index+width])/4;
+			}
+		}
+
+
+		"""
+
+		# Build the program
+		program = cl.Program(context, kernel_code).build()
+
+
+		for s in range(3):
+			host_dest = np.zeros(shape=(2*h, 2*w), dtype=np.float32)
+			d_output = cl_array.to_device(queue, host_dest)  # Create an empty GPU array
+
+			program.zoom2D_nearest_neighbour(queue, (w,h), None, d_input.data, d_output.data, np.int32(w), np.int32(h))
+			h *= 2
+			w *= 2
+
+			d_input = cl_array.empty_like(d_output)
+			program.copy(queue, (w,h), None, d_output.data, d_input.data, np.int32(w))
+
+		# # Retrieve results
+		input_array = d_input.get()
+		output_array = d_output.get()
+
+		plt.title(f"{self._testMethodName}")
+		plt.imshow(input_array)
+		plt.show()
+
+
+	def test05_laplace2d_grid_refinement(self):
+		"""
+		Je valide que je peux facilement zoomer a repetition en faisant Laplace.
+		Les tests ne sont pas tres concluant car je dois reallouer de la memoire a repetition
+		ce qui coute tres cher en performance.
+
+		Il faudrait eviter de réallouer de la memoire a chaque iteration en
+		ayant des numpy array plus grands que necessaires mais cela
+		demanderait de calculer les positions dans les numpy array a la
+		main partout.  Pour l'instant, c'est trop de travail sans être certain 
+		que le calcul sera énormement plus rapide.
+		"""
+
+		# Define a 3d array (float32)
+		h, w = 30,30
+		size = w*h
+		host_array = np.zeros(shape=(h, w), dtype=np.float32)
+		host_array[0,:] = 10
+
+		# Get OpenCL platform and device
+		platform = cl.get_platforms()[0]  # Select first platform
+		device = platform.get_devices()[0]  # Select first device (GPU or CPU)
+		context = cl.Context([device])  # Create OpenCL context
+		queue = cl.CommandQueue(context)  # Create command queue
+
+		# Create OpenCL buffers
+		d_input = cl_array.to_device(queue, host_array)  # Copy data to GPU
+
+
+		# Kernel program: Laplace in 3D
+		kernel_code = """
+		__kernel void zoom2D_nearest_neighbour(__global float* input, __global float* output, int width, int height) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
+
+		    int index_src = y * width + x;
+
+		    int index_dest1 = (2*y) * (2*width) + 2*x;
+		    int index_dest2 = (2*y) * (2*width) + 2*x + 1;
+		    int index_dest3 = (2*y) * (2*width) + 2*x + 2*width;
+		    int index_dest4 = (2*y) * (2*width) + 2*x + 2*width + 1;
+
+	    	output[index_dest1] = input[index_src];
+	    	output[index_dest2] = input[index_src];
+	    	output[index_dest3] = input[index_src];
+	    	output[index_dest4] = input[index_src];
+		}
+
+		__kernel void copy(__global float* input, __global float* output, int width) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
+
+		    int index = y * width + x;
+
+	    	output[index] = input[index];
+		}
+
+		__kernel void laplace(__global float* input, __global float* output, int width) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
+		    int index = y * width + x;
+
+		    if (x == 0 || y == 0 || x == width-1 || y == width-1) {
+		    	output[index] = input[index]; // Boundary is fixed
+		    } else {
+				output[index] = (input[index-1] + input[index+1] + input[index-width] + input[index+width])/4;
+			}
+		}
+
+
+		"""
+
+		# Build the program
+		program = cl.Program(context, kernel_code).build()
+
+
+		start_time = time.time()
+		for s in range(3):
+			host_dest = np.zeros(shape=(h, w), dtype=np.float32)
+			d_output = cl_array.to_device(queue, host_dest)
+
+			for i in range(5000):
+				# The calculation is sent to d_output, which I then use as the input for another iteration
+				# This way, d_input becomes the output and I do not have to create an array each time.  This is very efficient.
+				program.laplace(queue, (w,h), None, d_input.data, d_output.data, np.int32(w))
+				program.laplace(queue, (w,h), None, d_output.data, d_input.data, np.int32(w))
+
+				if i % 100 == 0:
+					d_diff = d_output - d_input
+
+					mean_val = cl_array.sum(d_diff).get() / size  # Mean (transfers single float)
+					d_diff_sq = (d_diff - mean_val) ** 2  # Element-wise (x - mean)^2
+					variance_val = cl_array.sum(d_diff_sq).get() / size  # Variance (transfers single float)
+					max_val = cl_array.max(d_diff).get() 
+					min_val = cl_array.min(d_diff).get() 
+					std_val = np.sqrt(variance_val)  # Standard deviation (final sqrt)
+					if std_val < 1e-5:
+						break
+			
+
+			zoom_dest = np.zeros(shape=(2*h, 2*w), dtype=np.float32)
+			d_input = cl_array.to_device(queue, zoom_dest)
+
+			program.zoom2D_nearest_neighbour(queue, (w,h), None, d_output.data, d_input.data, np.int32(w), np.int32(h))
+			h *= 2
+			w *= 2
+
+		input_array = d_input.get()
+		output_array = d_output.get()
+
+		print(f"OpenCL, with grid refinement: {time.time() - start_time:.3f} {input_array.shape}")
+
+		# # Retrieve results
+
+		plt.title(f"{self._testMethodName}")
+		plt.imshow(input_array)
+		plt.pause(0.1)
 
 if __name__ == "__main__":
-	unittest.main()
+	unittest.main(defaultTest=["OpenCLArrayTestCase.test05_laplace2d_grid_refinement","OpenCLArrayTestCase.test01_2Dopencl","ArrayManipulationTestCase.test12_laplace_with_finer_and_finer_grid"])
 
 
 
