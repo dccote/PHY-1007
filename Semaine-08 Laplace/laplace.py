@@ -31,7 +31,7 @@ class ScalarField:
 
 		self.values = np.zeros(shape=shape, dtype=np.float32)
 
-	def upscale(self, factor=2, order=2):
+	def upscale(self, factor=8, order=2):
 		self.values = zoom(self.values, factor, order=order)
 
 	def add_boundary_condition(self, index_or_slices, value_or_values):
@@ -285,7 +285,7 @@ class PotentialTestCase(unittest.TestCase):
 
 	def test_solve2D_then_upscale(self):
 		pot = ScalarField(shape=(8,8))
-		pot.solver = LaplacianSolverGPU()
+		pot.solver = LaplacianSolver()
 		pot.add_boundary_condition( (all, 0), 0)
 		pot.add_boundary_condition( (all, -1), 0)
 		pot.add_boundary_condition( (0, all), 10)
@@ -295,25 +295,22 @@ class PotentialTestCase(unittest.TestCase):
 		start_time = time.time()		
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		pot.upscale(factor=8, order=2)
-		pot.show(title=f"Upscaled solution", block=True)
+		pot.show(title=f"Upscaled solution")
 
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		pot.show(title=f"Actual solution", block=True)
+		pot.show(title=f"Actual solution")
 
 	def test_solve2D_with_upscale(self):
 		pot = ScalarField(shape=(8,8))
-		pot.solver = LaplacianSolverGPU()
+		pot.solver = LaplacianSolver()
 		pot.add_boundary_condition( (all, 0), 0)
 		pot.add_boundary_condition( (all, -1), 0)
 		pot.add_boundary_condition( (0, all), 10)
 		pot.add_boundary_condition( (-1, all), 5)
 
-		pot.apply_conditions()
-
 		start_time = time.time()		
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		pot.upscale(factor=16, order=0)
-		pot.apply_conditions()
 		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		print(f"[{it}] With NN refinement: {time.time()-start_time:.2f}")
 
@@ -321,7 +318,6 @@ class PotentialTestCase(unittest.TestCase):
 		start_time = time.time()		
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		pot.upscale(factor=16, order=1)
-		pot.apply_conditions()
 		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		print(f"[{it}] With lin refinement: {time.time()-start_time:.2f}")
 
@@ -329,20 +325,20 @@ class PotentialTestCase(unittest.TestCase):
 		start_time = time.time()		
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		pot.upscale(factor=16, order=2)
-		pot.apply_conditions()
 		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		print(f"[{it}] With quad refinement: {time.time()-start_time:.2f}")
+		print(f"[{it}] x16 With quad refinement: {time.time()-start_time:.2f}")
+		pot.show(title=f"{pot.values.shape}", block=True)
 
 		pot.reset(shape=(8,8))
 		start_time = time.time()		
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		pot.upscale(factor=8, order=2)
-		pot.apply_conditions()
-		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		pot.upscale(factor=8, order=2)
-		pot.apply_conditions()
-		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		print(f"[{it}] With quad refinement: {time.time()-start_time:.2f}")
+		pot.upscale(factor=4, order=2)
+		it1 = pot.solve_laplace_by_relaxation(tolerance=1e-6)
+		pot.upscale(factor=4, order=2)
+		it2 = pot.solve_laplace_by_relaxation(tolerance=1e-6)
+		pot.upscale(factor=4, order=2)
+		it3 = pot.solve_laplace_by_relaxation(tolerance=1e-6)
+		print(f"[{it1+it2+it3}] x4x4x4 With quad refinement: {time.time()-start_time:.2f}")
 		pot.show(title=f"{pot.values.shape}", block=True)
 
 		# pot.reset()
