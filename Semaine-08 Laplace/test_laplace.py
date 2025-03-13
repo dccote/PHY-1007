@@ -411,7 +411,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
 		"""
 
 		# Define a 3d array (float32)
-		d, h, w = 128,128,128
+		d, h, w = 256,256,256
 		size = d*w*h
 		host_array = np.zeros(shape=(d, h, w), dtype=np.float32)
 		host_array[0,:,:] = 10
@@ -675,7 +675,6 @@ class OpenCLArrayTestCase(unittest.TestCase):
 
 		"""
 		return kernel_code
-
 
 
 if __name__ == "__main__":
