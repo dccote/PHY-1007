@@ -69,21 +69,21 @@ class PotentialTestCase(unittest.TestCase):
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		pot.upscale(factor=16, order=0)
 		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		print(f"[{it}] With NN refinement: {time.time()-start_time:.2f}")
+		print(f"[{it}] With nearest refinement: {time.time()-start_time:.2f}")
 
 		pot.reset(shape=(8,8))
 		start_time = time.time()		
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		pot.upscale(factor=16, order=1)
 		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		print(f"[{it}] With lin refinement: {time.time()-start_time:.2f}")
+		print(f"[{it}] With linear refinement: {time.time()-start_time:.2f}")
 
 		pot.reset(shape=(8,8))
 		start_time = time.time()		
 		pot.solve_laplace_by_relaxation(tolerance=1e-6)
 		pot.upscale(factor=16, order=2)
 		it = pot.solve_laplace_by_relaxation(tolerance=1e-6)
-		print(f"[{it}] x16 With quad refinement: {time.time()-start_time:.2f}")
+		print(f"[{it}] x16 With quadratic refinement: {time.time()-start_time:.2f}")
 		pot.show(title=f"{pot.shape}")
 
 		pot.reset(shape=(8,8))
@@ -131,7 +131,7 @@ class PotentialTestCase(unittest.TestCase):
 
 		x = np.linspace(0,6.28,32)
 		pot.add_boundary_condition( (0, all), 10*np.sin(x))
-		pot.add_boundary_condition( (all, 0), 10*np.sin(x))
+		pot.add_boundary_condition( (-1, all), -10*np.sin(x))
 		pot.apply_conditions()
 		pot.solve_laplace_by_relaxation()
 
@@ -180,6 +180,22 @@ class PotentialTestCase(unittest.TestCase):
 		pot.show(slices=(all, 31, all), title=self._testMethodName)
 
 
+	def test_solve3D_GPU(self):
+		pot = ScalarField(shape=(32,32,32))
+		pot.solver = LaplacianSolverGPU()
+
+		pot.add_boundary_condition( ( -1, all, all), 10)
+		pot.add_boundary_condition( (all,   0, all), 0)
+		pot.add_boundary_condition( (all,  -1, all), 0)
+		pot.add_boundary_condition( (all, all,   0), 0)
+		pot.add_boundary_condition( (all, all,  -1), 0)
+		pot.add_boundary_condition( ( 0 , all, all), 10)
+		pot.apply_conditions()
+		pot.solve_laplace_by_relaxation(tolerance=1e-7)
+
+		pot.show(slices=(all, 31, all), title=self._testMethodName)
+
 if __name__ == "__main__":
-	unittest.main(defaultTest=['PotentialTestCase'])
+	# unittest.main(defaultTest=['PotentialTestCase'])
+	unittest.main()
 
