@@ -17,7 +17,7 @@ class PerformanceTestCase(unittest.TestCase):
 
 	def test_solve3D_CPU(self):
 		pot = ScalarField(shape=(16,16,16))
-		pot.sol2ver = LaplacianSolver()
+		pot.solver = LaplacianSolver()
 
 		pot.add_boundary_condition( ( -1, all, all), 10)
 		pot.add_boundary_condition( (all,   0, all), 0)
@@ -55,7 +55,7 @@ class PerformanceTestCase(unittest.TestCase):
 
 	def test_solve3D_CPU_refine(self):
 		pot = ScalarField(shape=(16,16,16))
-		pot.sol2ver = LaplacianSolver()
+		pot.solver = LaplacianSolver()
 
 		pot.add_boundary_condition( ( -1, all, all), 10)
 		pot.add_boundary_condition( (all,   0, all), 0)
