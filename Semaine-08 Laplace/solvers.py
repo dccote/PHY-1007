@@ -126,10 +126,10 @@ class LaplacianSolverGPU(LaplacianSolver):
 		error = None
 		i = 0
 		while error is None or error > tolerance:
-			self.program.laplace3D(self.queue, global_size, None, d_input.data, d_output.data, np.int32(w), np.int32(h), np.int32(d))
+			self.program.laplace3D_fast(self.queue, global_size, None, d_input.data, d_output.data, np.int32(w), np.int32(h), np.int32(d))
 			# The calculation is sent to d_output, which I then use as the input for another iteration
 			# This way, d_input becomes the output and I do not have to create an array each time.  This is very efficient.
-			self.program.laplace3D(self.queue, global_size, None, d_output.data, d_input.data, np.int32(w), np.int32(h), np.int32(d))
+			self.program.laplace3D_fast(self.queue, global_size, None, d_output.data, d_input.data, np.int32(w), np.int32(h), np.int32(d))
 
 			if i % 100 == 0:
 				error = self.variance(d_output - d_input)
@@ -174,6 +174,38 @@ class LaplacianSolverGPU(LaplacianSolver):
 		    	output[index] = input[index];
 		    } else {
 				output[index] = (input[index-1] + input[index+1] + input[index-width] + input[index+width] + input[index-width*height] + input[index+width*height])/6;
+			}
+		}
+
+		__kernel void laplace3D_fast(__global float* input, __global float* output, int width, int height, int depth) {
+		    int x = get_global_id(0);
+		    int y = get_global_id(1);
+		    int z = get_global_id(2);
+
+		    int index = z * (width * height) + y * width + x;
+
+		    if (x == 0 || y == 0 || z == 0 || x == width-1 || y == height-1 || z == depth-1) {
+		    	output[index] = input[index];
+		    } else {
+				__global float* outputPtr, *inputPtr;
+				outputPtr = output+index;
+				inputPtr = input + index -1;
+				*outputPtr += *inputPtr;
+				inputPtr += 2;
+				*outputPtr += *inputPtr;
+
+				inputPtr -= 1 + width;
+				*outputPtr += *inputPtr;
+				inputPtr += 2*width;
+				*outputPtr += *inputPtr;
+				
+				inputPtr += -width - width*height;
+				*outputPtr += *inputPtr;
+				inputPtr += 2*width*height;
+				*outputPtr += *inputPtr;
+
+				*(outputPtr) /= 6;
+
 			}
 		}
 

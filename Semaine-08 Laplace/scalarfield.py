@@ -34,6 +34,23 @@ class ScalarField:
 		for index_or_slices, value in self.conditions:
 			self.values[*index_or_slices] = value
 
+	def solve_laplace_by_relaxation_with_refinements(self, tolerance=1e-7):
+		# print(f"Demanded: {self.shape}")
+		final_shape = self.shape
+		iterations = 1
+		while self.shape[0] > 16:
+			self.reset(np.array(self.shape)//8)
+			iterations += 1
+
+		# print(f"Required {iterations}, starting with: {self.shape}")
+		for i in range(iterations):
+			self.solver.solve_by_relaxation(self, tolerance=tolerance)
+			if i != iterations-1:
+				self.upscale(factor=8, order=2)
+			
+
+		return self
+
 	def solve_laplace_by_relaxation(self, tolerance=1e-7):
 		return self.solver.solve_by_relaxation(self, tolerance=tolerance)
 
