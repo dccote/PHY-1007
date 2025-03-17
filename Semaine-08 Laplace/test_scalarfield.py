@@ -10,7 +10,7 @@ import unittest
 import numpy as np
 from scalarfield import ScalarField
 from solvers import LaplacianSolver, LaplacianSolverGPU
-
+from utils import all
 
 class PotentialTestCase(unittest.TestCase):
     """
@@ -18,7 +18,7 @@ class PotentialTestCase(unittest.TestCase):
 
     These tests evaluate different aspects of the ScalarField, including
     initialization, boundary condition application, Laplace equation solving,
-    and visualization. Tests are performed for _1d, _2d, and _3d fields,
+    and visualization. Tests are performed for 1d, 2d, and 3d fields,
     with comparisons between CPU and GPU solvers.
     """
 
@@ -31,12 +31,12 @@ class PotentialTestCase(unittest.TestCase):
         ScalarField(shape=(32, 32)).show(title=self._testMethodName)
 
     def test_conditions_2d(self):
-        """Test adding a simple boundary condition in _2d."""
+        """Test adding a simple boundary condition in 2d."""
         pot = ScalarField(shape=(32, 32))
         pot.add_boundary_condition((all, 0), 10)
 
     def test_apply_conditions_2d(self):
-        """Test applying boundary conditions in _2d."""
+        """Test applying boundary conditions in 2d."""
         pot = ScalarField(shape=(32, 32))
         pot.add_boundary_condition((0, all), 10)
         pot.add_boundary_condition((-1, all), 5)
@@ -44,7 +44,7 @@ class PotentialTestCase(unittest.TestCase):
         pot.show(title=self._testMethodName)
 
     def test_solve_2d(self):
-        """Test solving the Laplace equation in _2d using relaxation."""
+        """Test solving the Laplace equation in 2d using relaxation."""
         pot = ScalarField(shape=(32, 32))
         pot.add_boundary_condition((0, all), 10)
         pot.add_boundary_condition((-1, all), 5)
@@ -53,7 +53,7 @@ class PotentialTestCase(unittest.TestCase):
         pot.show(title=self._testMethodName)
 
     def test_solve_2d_then_upscale(self):
-        """Test solving in _2d, then upscaling the solution and refining it."""
+        """Test solving in 2d, then upscaling the solution and refining it."""
         pot = ScalarField(shape=(8, 8))
         pot.solver = LaplacianSolver()
         pot.add_boundary_condition((all, 0), 0)
@@ -103,7 +103,7 @@ class PotentialTestCase(unittest.TestCase):
         pot.show(title=self._testMethodName)
 
     def test_solve_2d_funky_conditions(self):
-        """Test solving with irregularly shaped boundary conditions in _2d."""
+        """Test solving with irregularly shaped boundary conditions in 2d."""
         pot = ScalarField(shape=(32, 32))
         pot.add_boundary_condition((0, all), 10)
         pot.add_boundary_condition((-1, all), 5)
@@ -114,13 +114,13 @@ class PotentialTestCase(unittest.TestCase):
         pot.show(title=self._testMethodName)
 
     def test_conditions_3d(self):
-        """Test adding and applying boundary conditions in _3d."""
+        """Test adding and applying boundary conditions in 3d."""
         pot = ScalarField(shape=(32, 32, 32))
         pot.add_boundary_condition((all, 0, 0), 10)
         pot.apply_conditions()
 
     def test_solve_1d(self):
-        """Test solving the Laplace equation in _1d."""
+        """Test solving the Laplace equation in 1d."""
         pot = ScalarField(shape=(32,))
         pot.add_boundary_condition((0,), 10)
         pot.add_boundary_condition((15,), 0)
@@ -130,7 +130,7 @@ class PotentialTestCase(unittest.TestCase):
         pot.show(title=self._testMethodName)
 
     def test_solve_3d(self):
-        """Test solving the Laplace equation in _3d with boundary conditions."""
+        """Test solving the Laplace equation in 3d with boundary conditions."""
         pot = ScalarField(shape=(64, 64, 64))
         pot.add_boundary_condition((-1, all, all), 10)
         pot.add_boundary_condition((all, 0, all), 0)
@@ -143,7 +143,7 @@ class PotentialTestCase(unittest.TestCase):
         pot.show(slices=(all, 31, all), title=self._testMethodName)
 
     def test_solve_3d_GPU(self):  # pylint: disable=invalid-name
-        """Test solving the Laplace equation in _3d using a GPU solver."""
+        """Test solving the Laplace equation in 3d using a GPU solver."""
         pot = ScalarField(shape=(32, 32, 32))
         pot.solver = LaplacianSolverGPU()
         pot.add_boundary_condition((-1, all, all), 10)
