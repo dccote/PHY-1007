@@ -156,7 +156,6 @@ class PotentialTestCase(unittest.TestCase):
         pot.solve_laplace_by_relaxation(tolerance=1e-7)
         pot.show(slices=(all, 31, all), title=self._testMethodName)
 
-
 if __name__ == "__main__":
     # unittest.main(defaultTest=["PotentialTestCase.test_solve_3d_GPU"])
     unittest.main()

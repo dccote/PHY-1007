@@ -28,15 +28,14 @@ l'évolution de ma compréhension des arrays numpy des slices, de la méthode de
 la relaxation pour solutionner l'équation de Laplace, et meme du code GPU a
 la fin.
 
-Vous n'avez qu'a rouler le code `python test_laplace.py`. Si vous n'avez pas
+Vous n'avez qu'a rouler le code python test_laplace.py. Si vous n'avez pas
 PyOpenCL, les tests de GPU ne fonctionneront simplement pas.
 
-`pip install pyopencl`
+pip install pyopencl
 
 """
 
 TOLERANCE = 1e-5
-
 
 class ArrayManipulationTestCase(unittest.TestCase):
     def test01_init(self):
@@ -389,7 +388,6 @@ class ArrayManipulationTestCase(unittest.TestCase):
                 plt.pause(0.1)
 
         print(f"\nCPU, with grid refinement {v.shape}: {time.time()-start_time:.3f}")
-
 
 @unittest.skipIf(cl is None, "PyOpenCL is not installed.")
 class OpenCLArrayTestCase(unittest.TestCase):
@@ -764,7 +762,6 @@ class OpenCLArrayTestCase(unittest.TestCase):
             }
         }
 
-
         __kernel void zoom2D_nearest_neighbour(__global float* input, __global float* output, int width, int height) {
             int x = get_global_id(0);
             int y = get_global_id(1);
@@ -794,7 +791,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
         """
         return kernel_code
 
-
 if __name__ == "__main__":
     # unittest.main(defaultTest=["OpenCLArrayTestCase.test05_laplace2d_grid_refinement","OpenCLArrayTestCase.test01_2Dopencl","ArrayManipulationTestCase.test12_laplace_with_finer_and_finer_grid","ArrayManipulationTestCase.test10_laplace_initial_condition_fct"])
     unittest.main()
+    

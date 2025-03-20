@@ -27,6 +27,7 @@ class ScalarField:
         """
         self.values = np.zeros(shape=shape, dtype=np.float32)
         self.conditions = []
+        self.condition_fct = None
         self.solver = LaplacianSolver()
 
     @property
@@ -77,12 +78,27 @@ class ScalarField:
         """
         self.conditions.append((index_or_slices, value_or_values))
 
+    def add_boundary_function(self, fct):
+        """
+        Adds a boundary condition function to the scalar field. This is used after each
+        iteration of the relaxation method, because points that are fixed (i.e.
+        bounadray points) get modified during the iteration, but they need
+        to be added back for the following iteration.
+
+        Parameters:
+        fct: 
+        """
+        self.condition_fct = fct
+
     def apply_conditions(self):
         """
         Applies all stored boundary conditions to the scalar field.
         """
-        for index_or_slices, value in self.conditions:
-            self.values[*index_or_slices] = value
+        if self.condition_fct is None:
+            for index_or_slices, value in self.conditions:
+                self.values[*index_or_slices] = value
+        else:
+            self.condition_fct(self.values)
 
     def solve_laplace_by_relaxation_with_refinements(
         self, factors=None, tolerance=1e-7

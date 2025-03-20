@@ -241,15 +241,58 @@ class LaplacianSolverGPU(LaplacianSolver):
         str: The OpenCL kernel code.
         """
         return """
+
         __kernel void laplace2D(__global float* input, __global float* output, int width) {
             int x = get_global_id(0);
             int y = get_global_id(1);
             int index = y * width + x;
 
             if (x == 0 || y == 0 || x == width-1 || y == width-1) {
-                output[index] = input[index];
+                output[index] = input[index]; // Boundary is fixed
             } else {
-                output[index] = (input[index-1] + input[index+1] + input[index-width] + input[index+width]) / 4;
+                output[index] = (input[index-1] + input[index+1] + input[index-width] + input[index+width])/4;
             }
         }
+
+        __kernel void laplace3D(__global float* input, __global float* output, int width, int height, int depth) {
+            int x = get_global_id(0);
+            int y = get_global_id(1);
+            int z = get_global_id(2);
+
+            int index = z * (width * height) + y * width + x;
+
+            if (x == 0 || y == 0 || z == 0 || x == width-1 || y == height-1 || z == depth-1) {
+                output[index] = input[index];
+            } else {
+                output[index] = (input[index-1] + input[index+1] + input[index-width] + input[index+width] + input[index-width*height] + input[index+width*height])/6;
+            }
+        }
+
+        __kernel void zoom2D_nearest_neighbour(__global float* input, __global float* output, int width, int height) {
+            int x = get_global_id(0);
+            int y = get_global_id(1);
+
+            int index_src = y * width + x;
+
+            int index_dest1 = (2*y) * (2*width) + 2*x;
+            int index_dest2 = (2*y) * (2*width) + 2*x + 1;
+            int index_dest3 = (2*y) * (2*width) + 2*x + 2*width;
+            int index_dest4 = (2*y) * (2*width) + 2*x + 2*width + 1;
+
+            output[index_dest1] = input[index_src];
+            output[index_dest2] = input[index_src];
+            output[index_dest3] = input[index_src];
+            output[index_dest4] = input[index_src];
+        }
+
+        __kernel void copy(__global float* input, __global float* output, int width) {
+            int x = get_global_id(0);
+            int y = get_global_id(1);
+
+            int index = y * width + x;
+
+            output[index] = input[index];
+        }
+
         """
+
