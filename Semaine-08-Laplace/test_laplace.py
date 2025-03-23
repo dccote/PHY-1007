@@ -3,10 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 from scipy.ndimage import zoom
+import os
 
 try:
     import pyopencl as cl
     import pyopencl.array as cl_array
+    # os.environ["PYOPENCL_SRC_DIR"] = os.path.dirname(cl.__file__) # bug in virtual environments if project has space
 except:
     print(
         "OpenCL not available. On Linux: sudo apt-get install python-pyopencl seems to work (Ubuntu ARM64 macOS)."
@@ -546,6 +548,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
     def setUp(self):
         # Get OpenCL platform and device
         self.platform = cl.get_platforms()[0]  # Select first platform
+
         self.device = self.platform.get_devices()[0]  # Select first device (GPU or CPU)
         self.context = cl.Context([self.device])  # Create OpenCL context
         self.queue = cl.CommandQueue(self.context)  # Create command queue

@@ -110,7 +110,7 @@ class PerformanceTestCase(unittest.TestCase):
         with grid refinement techniques. Runs simulations for increasing grid sizes and records
         the execution time.
         """
-        pot = ScalarField(shape=(16, 16, 16))
+        pot = ScalarField(shape=(16, 32, 16))
         pot.solver = LaplacianSolverGPU()
 
         # Define boundary conditions

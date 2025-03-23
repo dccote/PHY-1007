@@ -30,6 +30,9 @@ class ScalarField:
         self.condition_fct = None
         self.solver = LaplacianSolver()
 
+    def save(self, filepath):
+        self.array.save(filepath)
+
     @property
     def shape(self):
         """
@@ -80,13 +83,14 @@ class ScalarField:
 
     def add_boundary_function(self, fct):
         """
-        Adds a boundary condition function to the scalar field. This is used after each
+        Adds a boundary condition function to the scalar field. It must take the values as an input
+        and modify the values accordingly.  This is used after each
         iteration of the relaxation method, because points that are fixed (i.e.
         bounadray points) get modified during the iteration, but they need
         to be added back for the following iteration.
 
         Parameters:
-        fct: 
+        fct: function that takes a numpy array and modifies it with boundary conditions
         """
         self.condition_fct = fct
 
@@ -127,13 +131,11 @@ class ScalarField:
             factors = [1]
         else:
             total_factor = math.prod(factors)
-            self.reset(
-                (
-                    self.shape[0] // total_factor,
-                    self.shape[1] // total_factor,
-                    self.shape[2] // total_factor,
-                )
-            )
+            new_shape = np.array(self.shape) // total_factor
+            if np.min(new_shape) < 3:
+                raise ValueError(f"The total scaling factor {total_factor} from {factors} is too large, the resulting image is too small.")
+
+            self.reset(new_shape)
 
         print(
             f"Requiring {final_shape}, scaling by {factors}, starting with: {self.shape}"
