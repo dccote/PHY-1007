@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.ndimage import zoom
 from solvers import LaplacianSolver
+from utils import left, center, right
 
 
 class ScalarField:
@@ -18,7 +19,7 @@ class ScalarField:
     Laplacian solving, and visualization.
     """
 
-    def __init__(self, shape):
+    def __init__(self, shape, calibration=None):
         """
         Initializes the scalar field with a given shape (2D or 3D).
 
@@ -26,6 +27,11 @@ class ScalarField:
         shape (tuple): The shape of the field (2D or 3D array expected).
         """
         self.values = np.zeros(shape=shape, dtype=np.float32)
+        if calibration is None:
+            calibration = [1] * len(shape)
+
+        self.calibration = calibration
+
         self.conditions = []
         self.condition_fct = None
         self.solver = LaplacianSolver()
@@ -36,12 +42,48 @@ class ScalarField:
     @property
     def shape(self):
         """
-        Convcenience function to return the shape of the scalar field.
+        Convenience function to return the shape of the scalar field.
 
         Returns:
         tuple: The shape of the field.
         """
         return self.values.shape
+
+    def set_linear_gradient(self, shape, axis):
+        if axis == 0:
+            grad_line = np.linspace(0, 1, shape[0], endpoint=False, dtype=np.float32)
+            self.values = np.tile(grad_line[:, np.newaxis], (1, shape[1]))
+        elif axis == 1:
+            grad_line = np.linspace(0, 1, shape[1], endpoint=False, dtype=np.float32)
+            self.values = np.tile(grad_line[np.newaxis, :], (shape[0], 1))
+
+    def gradient(self):
+        """
+        We take the value shifted to the left and to the right to set the
+        value at a given point. However, this means we do not know the values
+        at the edges because they do not have a neighbour on one side.
+
+        We aren't sending people to space, or running a hospital, therefore
+        the values on the edge will be calculated from a single neighbour.
+
+        """
+
+        # First axis (0)
+        gradient_x = np.zeros(self.values.shape)
+        gradient_x[1:-1, :] = (self.values[right, :] - self.values[left, :]) / 2
+
+        # Right edge
+        gradient_x[0, :] = self.values[1, :] - self.values[0, :]
+        # Left edge
+        gradient_x[-1, :] = self.values[-1, :] - self.values[-2, :]
+
+        gradient_y = np.zeros(self.values.shape)
+        gradient_y[:, 1:-1] = (self.values[:, right] - self.values[:, left]) / 2
+        # Top edge
+        gradient_y[:, 0] = self.values[:, 1] - self.values[:, 0]
+        # bottom edge
+        gradient_y[:, -1] = self.values[:, -1] - self.values[:, -2]
+        return (gradient_x, gradient_y)
 
     def reset(self, shape=None):
         """
@@ -133,7 +175,9 @@ class ScalarField:
             total_factor = math.prod(factors)
             new_shape = np.array(self.shape) // total_factor
             if np.min(new_shape) < 3:
-                raise ValueError(f"The total scaling factor {total_factor} from {factors} is too large, the resulting image is too small.")
+                raise ValueError(
+                    f"The total scaling factor {total_factor} from {factors} is too large, the resulting image is too small."
+                )
 
             self.reset(new_shape)
 
