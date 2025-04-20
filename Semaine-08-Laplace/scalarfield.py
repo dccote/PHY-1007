@@ -85,6 +85,28 @@ class ScalarField:
         gradient_y[:, -1] = self.values[:, -1] - self.values[:, -2]
         return (gradient_x, gradient_y)
 
+    def value_at_fractional_index(self, i_float: float, j_float: float):
+        """
+        We will often need to value in between discrete steps.
+        We will take a linear interpolation beteen the two values
+        """
+
+        if i_float < 0 or i_float >= self.values.shape[0] - 1:
+            raise ValueError(f"Outside of the range in i : {i_float}")
+        if j_float < 0 or j_float > self.values.shape[1] - 1:
+            raise ValueError(f"Outside of the range in j : {j_float}")
+
+        i = int(np.floor_divide(i_float, 1))
+        i_frac = np.remainder(i_float, 1)
+        j = int(np.floor_divide(j_float, 1))
+        j_frac = np.remainder(j_float, 1)
+
+        return (
+            self.values[i, j]
+            + i_frac * (self.values[i + 1, j] - self.values[i, j])
+            + j_frac * (self.values[i, j + 1] - self.values[i, j])
+        )
+
     def reset(self, shape=None):
         """
         Resets the scalar field to zeros with the given shape (if provided)

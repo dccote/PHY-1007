@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class SurfaceDomain:
     def __init__(self, size=None, radius=None, M=5, N=19, X=None, Y=None):
         """
@@ -14,14 +15,18 @@ class SurfaceDomain:
             X, Y = self.create_polar_meshgrid(radius, M, N)
         elif X is None or Y is None:
             X, Y = self.create_square_meshgrid()
+        elif X is not None and Y is not None:
+            pass
         else:
             raise ValueError("Vous devez fournir size, radius ou X et Y")
-            
-        if len(X) != len(Y):
-            raise ValueError("Les composantes X et Y doivent avoir le meme nombre d'éléments")
 
-        self.X = X 
-        self.Y = Y # et d'utiliser les @property accessors ou les fonctions
+        if len(X) != len(Y):
+            raise ValueError(
+                "Les composantes X et Y doivent avoir le meme nombre d'éléments"
+            )
+
+        self.X = X
+        self.Y = Y  # et d'utiliser les @property accessors ou les fonctions
 
     def xy_mesh(self, xo=0, yo=0):
         """
@@ -31,20 +36,20 @@ class SurfaceDomain:
 
         Par défaut, l'origine est à (0,0)
         """
-        X,Y = self.X-xo, self.Y-yo
-        return X,Y
+        X, Y = self.X - xo, self.Y - yo
+        return X, Y
 
     def rphi_mesh(self, xo=0, yo=0):
         """
-        Les np.arrays en coordonnées polaires, R,PHI du meshgrid, mais 
+        Les np.arrays en coordonnées polaires, R,PHI du meshgrid, mais
         relatif à l'origine (xo, yo).
         Ceci permet d'utiliser directement les valeurs pour le calcul du
         champ d'une charge unique.
 
         Par défaut, l'origine est à (0,0)
         """
-        X,Y = self.xy_mesh(xo, yo)
-        return np.sqrt(X*X+Y*Y), np.arctan2(Y, X)
+        X, Y = self.xy_mesh(xo, yo)
+        return np.sqrt(X * X + Y * Y), np.arctan2(Y, X)
 
     def set_square_meshgrid(self, size=20, N=19):
         """
@@ -62,22 +67,23 @@ class SurfaceDomain:
         """
         Fonction pour créer un domaine XY rapidement
         """
-        x = np.linspace(-size/2,size/2, N)
-        y = np.linspace(-size/2,size/2, N)
-        return np.meshgrid(x,y)
+        x = np.linspace(-size / 2, size / 2, N)
+        y = np.linspace(-size / 2, size / 2, N)
+        return np.meshgrid(x, y)
 
     def create_polar_meshgrid(self, radius=20, M=5, N=36):
         """
         Fonction pour créer un domaine XY a symétrie polaire rapidement
-        On conserve quand meme tout dans les vecteurs X et Y, mais la 
+        On conserve quand meme tout dans les vecteurs X et Y, mais la
         symétrie sera polaire.
         """
-        r = np.linspace(radius/M, radius, M)
-        phi = np.linspace(0, 2*np.pi, N)
+        r = np.linspace(radius / M, radius, M)
+        phi = np.linspace(0, 2 * np.pi, N)
         R, PHI = np.meshgrid(r, phi)
-        X = R*np.cos(PHI)
-        Y = R*np.sin(PHI)
+        X = R * np.cos(PHI)
+        Y = R * np.sin(PHI)
         return X, Y
+
 
 class VectorField2D:
     def __init__(self, surface=None, U=None, V=None):
@@ -87,7 +93,7 @@ class VectorField2D:
         initialisé à 0,0 partout.
         """
         if surface is None:
-            surface = SurfaceDomain()
+            surface = SurfaceDomain(M=U.shape[0], N=U.shape[1])
 
         self.domain = surface
 
@@ -99,16 +105,18 @@ class VectorField2D:
 
         self.quiver_axes = None
 
-        self.validate_arrays() # Avant d'aller plus loin, nous voulons un champ valide
-
+        self.validate_arrays()  # Avant d'aller plus loin, nous voulons un champ valide
 
     @property
     def field_magnitude(self):
-        return np.sqrt(self.U*self.U+self.V*self.V)
+        return np.sqrt(self.U * self.U + self.V * self.V)
 
     def create_null_field_components(self):
-        X,Y = self.domain.xy_mesh()
-        return X*0, X*0 # C'est un truc pour avoir rapidement une liste de la meme longueur avec des zeros
+        X, Y = self.domain.xy_mesh()
+        return (
+            X * 0,
+            X * 0,
+        )  # C'est un truc pour avoir rapidement une liste de la meme longueur avec des zeros
 
     def create_single_charge_field_components(self, xo=0, yo=0, q=1):
         R, PHI = self.domain.rphi_mesh(xo, yo)
@@ -119,10 +127,10 @@ class VectorField2D:
         commande with np.errstate() pour la division par zéro.  
         La methode add_field_components() devra par la suite filtrer les valeurs infinies
         """
-        
-        with np.errstate(divide='ignore', invalid='ignore'):
-            U, V = q*np.cos(PHI)/(R*R), q*np.sin(PHI)/(R*R)
-        return U,V
+
+        with np.errstate(divide="ignore", invalid="ignore"):
+            U, V = q * np.cos(PHI) / (R * R), q * np.sin(PHI) / (R * R)
+        return U, V
 
     def add_field_components(self, U, V):
         """
@@ -136,7 +144,9 @@ class VectorField2D:
         self.V[v_valid] += V[v_valid]
         self.validate_arrays()
 
-        self.quiver_axes = None # Nous avons changé le champ, la figure n'est plus valide
+        self.quiver_axes = (
+            None  # Nous avons changé le champ, la figure n'est plus valide
+        )
 
     def add_single_charge(self, xo=0, yo=0, q=1):
         U, V = self.create_single_charge_field_components(xo, yo, q)
@@ -144,30 +154,34 @@ class VectorField2D:
 
     def validate_arrays(self):
         if self.U is None or self.V is None:
-            raise ValueError("Les composantes U et V du champ vectoriel ne sont pas assignées en tout point X et Y")
+            raise ValueError(
+                "Les composantes U et V du champ vectoriel ne sont pas assignées en tout point X et Y"
+            )
 
         if len(self.U) != len(self.V):
-            raise ValueError("Les composantes U et V doivent avoir le meme nombre d'éléments")
+            raise ValueError(
+                "Les composantes U et V doivent avoir le meme nombre d'éléments"
+            )
 
         if np.isnan(self.U).any():
-            raise ValueError('U is invalid')
+            raise ValueError("U is invalid")
         if np.isinf(self.U).any():
-            raise ValueError('U has infinity')
+            raise ValueError("U has infinity")
         if np.isnan(self.V).any():
-            raise ValueError('V is invalid')
+            raise ValueError("V is invalid")
         if np.isinf(self.V).any():
-            raise ValueError('V has infinity')
-            
+            raise ValueError("V has infinity")
+
     def display(self, use_color=True, title=None):
         self.validate_arrays()
 
         if self.quiver_axes is None:
-            self.quiver_axes = plt.subplot(1,1,1)
+            self.quiver_axes = plt.subplot(1, 1, 1)
             self.quiver_axes.tick_params(direction="in")
 
         self.quiver_axes.cla()
 
-        X,Y = self.domain.xy_mesh()
+        X, Y = self.domain.xy_mesh()
 
         if use_color:
             """
@@ -175,7 +189,7 @@ class VectorField2D:
             la force du champ, je garde les fleches de la meme longueur
             et je les colore en fonction de la force du champ.
 
-            Je dois gérer lorsque la longueur du vecteur est nulle, car on 
+            Je dois gérer lorsque la longueur du vecteur est nulle, car on
             tente de normaliser un vecteur nul, ce qui n'est pas possible.
             Cependant, si je mets lengths == 1, j'aurai simplement U/length == 0
             et V/lengths == 0 donc ce sera ok.
@@ -183,13 +197,12 @@ class VectorField2D:
 
             lengths = self.field_magnitude
 
-            null_field = (lengths == 0)
+            null_field = lengths == 0
             lengths[null_field] = 1
 
-            U = self.U/lengths
-            V = self.V/lengths
+            U = self.U / lengths
+            V = self.V / lengths
 
-            
             """
             Les couleurs sont biaisées car il y a souvent des valeurs tres grandes.
             PLutot que de normaliser sur la plus grande valeurs, je limite
@@ -209,13 +222,18 @@ class VectorField2D:
         else:
             self.quiver_axes.quiver(X, Y, self.U, self.V)
 
-        self.quiver_axes.set_aspect('equal')
+        self.quiver_axes.set_aspect("equal")
         plt.title(title)
         plt.show()
         self.quiver_axes = None
 
-if __name__ == "__main__": # C'est la façon rigoureuse d'ajouter du code après une classe
-    single_charge_field = VectorField2D() # Le domaine par défaut est -10 a 10 avec 19 points par dimension
+
+if (
+    __name__ == "__main__"
+):  # C'est la façon rigoureuse d'ajouter du code après une classe
+    single_charge_field = (
+        VectorField2D()
+    )  # Le domaine par défaut est -10 a 10 avec 19 points par dimension
     single_charge_field.add_single_charge(xo=0, yo=0, q=1)
     single_charge_field.display(use_color=True, title="Une seule charge")
 
