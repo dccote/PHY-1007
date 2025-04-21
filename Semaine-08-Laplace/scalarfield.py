@@ -37,7 +37,7 @@ class ScalarField:
         self.solver = LaplacianSolver()
 
     def save(self, filepath):
-        self.array.save(filepath)
+        np.save(filepath, self.values)
 
     @property
     def shape(self):

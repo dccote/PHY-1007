@@ -19,7 +19,6 @@ class GradientTestCase(unittest.TestCase):
         """Test that a ScalarField instance is initialized properly."""
         self.assertIsNotNone(ScalarField(shape=(32, 32)))
 
-    @unittest.SkipTest
     def test_linear_gradient(self):
         potential = ScalarField(shape=(32, 64))
 
@@ -27,19 +26,16 @@ class GradientTestCase(unittest.TestCase):
         potential.values = np.broadcast_to(gradient_line, potential.shape)
         potential.show()
 
-    @unittest.SkipTest
     def test_field_is_linear_axis_0(self):
         potential = ScalarField(shape=(32, 64))
         potential.set_linear_gradient(potential.shape, axis=0)
         potential.show()
 
-    @unittest.SkipTest
     def test_field_is_linear_axis_1(self):
         potential = ScalarField(shape=(32, 64))
         potential.set_linear_gradient(potential.shape, axis=1)
         potential.show()
 
-    @unittest.SkipTest
     def test_linear_in_x_field_null_gradient_in_x(self):
         """
         A linear field in x gives a constant gradient.
@@ -61,7 +57,6 @@ class GradientTestCase(unittest.TestCase):
 
         potential.show()
 
-    @unittest.SkipTest
     def test_linear_in_y_field_null_gradient_in_y(self):
         """
         A linear field in y gives a constant gradient.

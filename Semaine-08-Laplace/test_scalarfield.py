@@ -12,6 +12,7 @@ from scalarfield import ScalarField
 from solvers import LaplacianSolver, LaplacianSolverGPU
 from utils import all
 
+
 class PotentialTestCase(unittest.TestCase):
     """
     Unit tests for the ScalarField class.
@@ -122,11 +123,11 @@ class PotentialTestCase(unittest.TestCase):
     def boundaries(self, array):
         """Boundary function that sets a central high-potential point in 2D or 3D arrays."""
         if array.ndim == 3:
-            a,b,c = array.shape
-            array[a//2,b//2,c//2] = 100
+            a, b, c = array.shape
+            array[a // 2, b // 2, c // 2] = 100
         else:
-            a,b = array.shape
-            array[a//2,b//2] = 100
+            a, b = array.shape
+            array[a // 2, b // 2] = 100
 
     def test_conditions_2d_fct(self):
         """Test adding and applying boundary conditions via a function in 2D."""
@@ -138,19 +139,19 @@ class PotentialTestCase(unittest.TestCase):
 
     def test_conditions_2d_fct_with_refinement(self):
         """Test adding boundary conditions via a function in 2D, with multi-scale refinement."""
-        pot = ScalarField(shape=(128,128))
+        pot = ScalarField(shape=(128, 128))
         pot.add_boundary_function(self.boundaries)
         pot.apply_conditions()
-        pot.solve_laplace_by_relaxation_with_refinements([8,4],tolerance=1e-7)
+        pot.solve_laplace_by_relaxation_with_refinements([8, 4], tolerance=1e-7)
         pot.show()
 
     def test_solve_2d_with_refinement_too_high(self):
         """Test that using too large a refinement scale raises an error in 2D relaxation."""
-        pot = ScalarField(shape=(128,128))
+        pot = ScalarField(shape=(128, 128))
         pot.add_boundary_function(self.boundaries)
         pot.apply_conditions()
         with self.assertRaises(ValueError):
-            pot.solve_laplace_by_relaxation_with_refinements([64],tolerance=1e-7)
+            pot.solve_laplace_by_relaxation_with_refinements([64], tolerance=1e-7)
 
     def test_conditions_3d_fct(self):
         """Test adding and applying boundary conditions via a function in 3D."""
@@ -195,6 +196,15 @@ class PotentialTestCase(unittest.TestCase):
         pot.apply_conditions()
         pot.solve_laplace_by_relaxation(tolerance=1e-7)
         pot.show(slices=(all, 31, all), title=self._testMethodName)
+
+    def test_conditions_2d_save(self):
+        """Test adding boundary conditions via a function in 2D, with multi-scale refinement."""
+        pot = ScalarField(shape=(128, 128))
+        pot.add_boundary_function(self.boundaries)
+        pot.apply_conditions()
+        pot.solve_laplace_by_relaxation_with_refinements([8, 4], tolerance=1e-7)
+        pot.save("potential.npy")
+
 
 if __name__ == "__main__":
     # unittest.main(defaultTest=["PotentialTestCase.test_conditions_2d_fct_with_refinement"])
