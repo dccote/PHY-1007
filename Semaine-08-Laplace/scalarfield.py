@@ -8,8 +8,8 @@ and visualised.
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.ndimage import zoom
-from solvers import LaplacianSolver
+from scipy.ndimage import zoom, binary_dilation
+from solvers import LaplacianSolver, LaplacianSolverGPU
 from utils import left, center, right
 
 
@@ -66,24 +66,74 @@ class ScalarField:
         We aren't sending people to space, or running a hospital, therefore
         the values on the edge will be calculated from a single neighbour.
 
+        Returns a tuple of gradient arrays, one per axis.
+        2D: (gradient_x, gradient_y)
+        3D: (gradient_x, gradient_y, gradient_z)
         """
 
-        # First axis (0)
-        gradient_x = np.zeros(self.values.shape)
-        gradient_x[1:-1, :] = (self.values[right, :] - self.values[left, :]) / 2
+        grads = []
+        for axis in range(self.values.ndim):
+            g = np.zeros(self.values.shape)
 
-        # Right edge
-        gradient_x[0, :] = self.values[1, :] - self.values[0, :]
-        # Left edge
-        gradient_x[-1, :] = self.values[-1, :] - self.values[-2, :]
+            # Interior: central difference
+            sl_left = [slice(None)] * self.values.ndim
+            sl_right = [slice(None)] * self.values.ndim
+            sl_center = [slice(None)] * self.values.ndim
+            sl_left[axis] = left
+            sl_right[axis] = right
+            sl_center[axis] = center
+            g[tuple(sl_center)] = (self.values[tuple(sl_right)] - self.values[tuple(sl_left)]) / 2
 
-        gradient_y = np.zeros(self.values.shape)
-        gradient_y[:, 1:-1] = (self.values[:, right] - self.values[:, left]) / 2
-        # Top edge
-        gradient_y[:, 0] = self.values[:, 1] - self.values[:, 0]
-        # bottom edge
-        gradient_y[:, -1] = self.values[:, -1] - self.values[:, -2]
-        return (gradient_x, gradient_y)
+            # Edges: forward/backward difference
+            sl_0 = [slice(None)] * self.values.ndim
+            sl_1 = [slice(None)] * self.values.ndim
+            sl_0[axis] = 0
+            sl_1[axis] = 1
+            g[tuple(sl_0)] = self.values[tuple(sl_1)] - self.values[tuple(sl_0)]
+
+            sl_m1 = [slice(None)] * self.values.ndim
+            sl_m2 = [slice(None)] * self.values.ndim
+            sl_m1[axis] = -1
+            sl_m2[axis] = -2
+            g[tuple(sl_m1)] = self.values[tuple(sl_m1)] - self.values[tuple(sl_m2)]
+
+            grads.append(g)
+
+        return tuple(grads)
+
+    @property
+    def boundary_mask(self):
+        """
+        Returns a boolean mask of all pixels covered by any boundary condition.
+        """
+        mask = np.zeros(self.shape, dtype=bool)
+        for index_or_slices, _ in self.conditions:
+            mask[index_or_slices] = True
+        return mask
+
+    def boundary_outline(self, mask=None):
+        """
+        Returns the outline (just outside the boundary region) and outward normals.
+
+        Parameters:
+        mask: optional boolean array. If None, uses all stored boundary conditions.
+
+        Returns:
+        outline : boolean array — True on pixels just outside the region
+        n0, n1, [n2] : float arrays — outward unit normal components (one per axis)
+        """
+        if mask is None:
+            mask = self.boundary_mask
+
+        outline = binary_dilation(mask) & ~mask
+
+        grad_mask = np.array(np.gradient(mask.astype(float)))
+        norm = np.sqrt(np.sum(grad_mask ** 2, axis=0))
+        norm[norm == 0] = 1
+
+        normals = tuple(grad_mask[i] / norm for i in range(self.values.ndim))
+
+        return (outline, *normals)
 
     def value_at_fractional_index(self, i_float: float, j_float: float):
         """
