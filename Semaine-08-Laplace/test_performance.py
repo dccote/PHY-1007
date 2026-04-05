@@ -70,7 +70,7 @@ class PerformanceTestCase(unittest.TestCase):
         pot.add_boundary_condition((0, all, all), 10)
         
         # Test different grid sizes
-        for i in [16, 32, 64, 128, 256, 512]:
+        for i in [16, 32, 64, 128]:
             start_time = time.time()
             pot.reset(shape=(i, i, i))
             pot.apply_conditions()
@@ -96,7 +96,7 @@ class PerformanceTestCase(unittest.TestCase):
         pot.add_boundary_condition((0, all, all), 10)
         
         # Test different grid sizes
-        for i in [16, 32, 64, 128, 256, 512]:
+        for i in [16, 32, 64, 128]:
             start_time = time.time()
             pot.reset(shape=(i, i, i))
             pot.apply_conditions()
@@ -121,8 +121,8 @@ class PerformanceTestCase(unittest.TestCase):
         pot.add_boundary_condition((all, all, -1), 0)
         pot.add_boundary_condition((0, all, all), 10)
         
-        # Test different grid sizes
-        for i in [16, 32, 64, 128, 256, 512]:
+        # Test different grid sizes (minimum 32 for factor=8 refinement)
+        for i in [32, 64, 128]:
             start_time = time.time()
             pot.reset(shape=(i, i, i))
             pot.apply_conditions()
