@@ -389,7 +389,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         axes[1].set_title("Profil a mi-hauteur (lineaire)")
         axes[1].grid(True)
         plt.tight_layout()
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_02_boite_avec_conditions(self):
         """Quatre cotes avec des potentiels differents:
@@ -411,7 +412,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         plt.title("Boite: haut=10V, bas=0V, cotes=5V")
         plt.xlabel("x")
         plt.ylabel("y")
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_03_condition_sinusoidale(self):
         """Condition frontiere sinusoidale en haut (V = 10*sin(x)),
@@ -434,7 +436,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         plt.title("Condition sinusoidale en haut")
         plt.xlabel("x")
         plt.ylabel("y")
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_04_conducteur_central(self):
         """Un conducteur carre au centre a 10V, entoure de murs a 0V.
@@ -457,7 +460,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         plt.title("Conducteur central=10V, murs=0V")
         plt.xlabel("x")
         plt.ylabel("y")
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_05_gradient_et_champ_electrique(self):
         """On resout le potentiel puis on calcule le champ electrique E = -grad(V).
@@ -490,7 +494,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         fig.colorbar(axes[1].images[0], ax=axes[1], label="|E|")
 
         plt.tight_layout()
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_06_outline_et_normales(self):
         """On montre le contour (outline) d'un conducteur et les normales sortantes.
@@ -518,7 +523,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         plt.title("Outline du conducteur avec normales sortantes")
         plt.xlabel("x")
         plt.ylabel("y")
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_07_densite_de_charge_surface(self):
         """On calcule sigma = epsilon_0 * E·n a la surface d'un conducteur.
@@ -552,7 +558,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         plt.xlabel("x")
         plt.ylabel("y")
         plt.axis('equal')
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
 
     def test_demo_08_boundary_mask(self):
@@ -581,7 +588,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         fig.colorbar(axes[1].images[0], ax=axes[1], label="V")
 
         plt.tight_layout()
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_09_outline_simple(self):
         """boundary_outline retourne les pixels juste a l'exterieur
@@ -624,7 +632,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         axes[2].set_title("Outline rectangle B (5V)")
 
         plt.tight_layout()
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_10_normales_sur_formes(self):
         """Les normales sortantes permettent de calculer le flux E·n.
@@ -670,7 +679,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         plt.title("Normales sortantes: rectangle (10V) et carre (-5V)")
         plt.xlabel("x")
         plt.ylabel("y")
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test_demo_11_flux_et_charge_totale(self):
         """On calcule la charge totale Q = sum(epsilon_0 * E·n) sur le
@@ -718,7 +728,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         axes[1].axis('equal')
 
         plt.tight_layout()
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
 
 if __name__ == "__main__":

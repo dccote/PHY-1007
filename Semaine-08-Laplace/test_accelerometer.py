@@ -188,7 +188,8 @@ class TestAccelerometer(unittest.TestCase):
         plt.ylabel("C / l (capacitance per unit finger length)")
         plt.title("C/l vs N (fixed spacing)")
         plt.grid(True)
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
 
     def test02_capacitance_per_length_vs_spacing(self):
@@ -215,7 +216,8 @@ class TestAccelerometer(unittest.TestCase):
         plt.ylabel("C / l (capacitance per unit finger length)")
         plt.title("C/l vs spacing (N=10)")
         plt.grid(True)
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
 
     def test03_capacitance_per_length_vs_thickness(self):
@@ -242,7 +244,8 @@ class TestAccelerometer(unittest.TestCase):
         plt.ylabel("C / l (capacitance per unit finger length)")
         plt.title(f"C/l vs thickness (N={N}, gap={gap}, S={S})")
         plt.grid(True)
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
 
 def interdigitated_potential_3d(Sx, Sy, Sz, N, l, t, h, d=0, gap=None, V_pos=3, V_neg=0):
@@ -369,7 +372,8 @@ class TestAccelerometer3D(unittest.TestCase):
         axes[1, 2].set_ylabel("z")
 
         plt.tight_layout()
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
     def test02_3d_capacitance(self):
         """Compute the capacitance of the 3D accelerometer."""
@@ -401,7 +405,8 @@ class TestAccelerometer3D(unittest.TestCase):
         plt.ylabel("Capacitance C")
         plt.title("3D: C vs finger height")
         plt.grid(True)
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
 
 if __name__ == "__main__":

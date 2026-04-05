@@ -251,7 +251,8 @@ class GradientTestCase(unittest.TestCase):
         coords = np.stack(pts)
         x, y = coords[:, 0], coords[:, 1]
         plt.plot(x, y)
-        plt.show()
+        plt.pause(0.5)
+        plt.close()
 
 
 def is_colliding(obstacles, start, end):
