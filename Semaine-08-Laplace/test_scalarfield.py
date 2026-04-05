@@ -542,8 +542,8 @@ class TestScalarFieldDemo(unittest.TestCase):
         outline, nx, ny = sf.boundary_outline(mask)
         oy, ox = np.where(outline)
 
-        # sigma = epsilon_0 * E·n  (epsilon_0 = 1 en unites de grille)
-        sigma = Ex[outline] * nx[outline] + Ey[outline] * ny[outline]
+        # sigma = epsilon_0 * E·n = -grad(V)·n  (epsilon_0 = 1 en unites de grille)
+        sigma = -(Ex[outline] * nx[outline] + Ey[outline] * ny[outline])
 
         plt.figure(figsize=(6, 6))
         plt.scatter(ox, oy, c=sigma, cmap='coolwarm', s=10)
@@ -692,12 +692,12 @@ class TestScalarFieldDemo(unittest.TestCase):
         mask_a = np.zeros(sf.shape, dtype=bool)
         mask_a[20:40, 20:40] = True
         outline_a, nx_a, ny_a = sf.boundary_outline(mask_a)
-        Q_a = np.sum(Ex[outline_a] * nx_a[outline_a] + Ey[outline_a] * ny_a[outline_a])
+        Q_a = np.sum(-(Ex[outline_a] * nx_a[outline_a] + Ey[outline_a] * ny_a[outline_a]))
 
         mask_b = np.zeros(sf.shape, dtype=bool)
         mask_b[60:80, 60:80] = True
         outline_b, nx_b, ny_b = sf.boundary_outline(mask_b)
-        Q_b = np.sum(Ex[outline_b] * nx_b[outline_b] + Ey[outline_b] * ny_b[outline_b])
+        Q_b = np.sum(-(Ex[outline_b] * nx_b[outline_b] + Ey[outline_b] * ny_b[outline_b]))
 
         fig, axes = plt.subplots(1, 2, figsize=(13, 5))
 
@@ -707,8 +707,8 @@ class TestScalarFieldDemo(unittest.TestCase):
 
         oy_a, ox_a = np.where(outline_a)
         oy_b, ox_b = np.where(outline_b)
-        sigma_a = Ex[outline_a] * nx_a[outline_a] + Ey[outline_a] * ny_a[outline_a]
-        sigma_b = Ex[outline_b] * nx_b[outline_b] + Ey[outline_b] * ny_b[outline_b]
+        sigma_a = -(Ex[outline_a] * nx_a[outline_a] + Ey[outline_a] * ny_a[outline_a])
+        sigma_b = -(Ex[outline_b] * nx_b[outline_b] + Ey[outline_b] * ny_b[outline_b])
 
         axes[1].scatter(ox_a, oy_a, c=sigma_a, cmap='coolwarm', s=8, vmin=-2, vmax=2)
         axes[1].scatter(ox_b, oy_b, c=sigma_b, cmap='coolwarm', s=8, vmin=-2, vmax=2)

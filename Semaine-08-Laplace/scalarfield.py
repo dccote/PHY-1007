@@ -131,7 +131,8 @@ class ScalarField:
         norm = np.sqrt(np.sum(grad_mask ** 2, axis=0))
         norm[norm == 0] = 1
 
-        normals = tuple(grad_mask[i] / norm for i in range(self.values.ndim))
+        # grad_mask points inward (from 0 to 1), negate for outward normals
+        normals = tuple(-grad_mask[i] / norm for i in range(self.values.ndim))
 
         return (outline, *normals)
 

@@ -71,7 +71,8 @@ def interdigitated_capacitance(S, N, l, t, d=0, gap=None, V_pos=3, V_neg=0):
         pos_mask[i * delta: i * delta + t, 0:l] = True
 
     outline_pos, nx_pos, ny_pos = potential.boundary_outline(pos_mask)
-    sigma_pos = Ex[outline_pos] * nx_pos[outline_pos] + Ey[outline_pos] * ny_pos[outline_pos]
+    # E = -grad(V), sigma = epsilon_0 * E·n = -grad(V)·n
+    sigma_pos = -(Ex[outline_pos] * nx_pos[outline_pos] + Ey[outline_pos] * ny_pos[outline_pos])
     Q_pos = np.sum(sigma_pos)
 
     V = V_pos - V_neg
@@ -138,10 +139,10 @@ class TestUtilities(unittest.TestCase):
             neg_mask[offset + i * delta: offset + i * delta + t, S - l:S] = True
 
         outline_pos, nx_pos, ny_pos = potential.boundary_outline(pos_mask)
-        Q_pos = np.sum(Ex[outline_pos] * nx_pos[outline_pos] + Ey[outline_pos] * ny_pos[outline_pos])
+        Q_pos = np.sum(-(Ex[outline_pos] * nx_pos[outline_pos] + Ey[outline_pos] * ny_pos[outline_pos]))
 
         outline_neg, nx_neg, ny_neg = potential.boundary_outline(neg_mask)
-        Q_neg = np.sum(Ex[outline_neg] * nx_neg[outline_neg] + Ey[outline_neg] * ny_neg[outline_neg])
+        Q_neg = np.sum(-(Ex[outline_neg] * nx_neg[outline_neg] + Ey[outline_neg] * ny_neg[outline_neg]))
 
         relative_error = abs(Q_pos + Q_neg) / abs(Q_pos)
         self.assertLess(relative_error, 0.05)
@@ -309,9 +310,10 @@ def interdigitated_capacitance_3d(Sx, Sy, Sz, N, l, t, h, d=0, gap=None, V_pos=3
         pos_mask[i * delta: i * delta + t, 0:l, z0:z0 + h] = True
 
     outline, nx, ny, nz = potential.boundary_outline(pos_mask)
-    sigma = (Ex[outline] * nx[outline]
-             + Ey[outline] * ny[outline]
-             + Ez[outline] * nz[outline])
+    # E = -grad(V), sigma = epsilon_0 * E·n = -grad(V)·n
+    sigma = -(Ex[outline] * nx[outline]
+              + Ey[outline] * ny[outline]
+              + Ez[outline] * nz[outline])
     Q_pos = np.sum(sigma)
 
     V = V_pos - V_neg
