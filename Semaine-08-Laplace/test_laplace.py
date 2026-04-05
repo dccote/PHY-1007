@@ -425,14 +425,15 @@ class OpenCLArrayTestCase(unittest.TestCase):
         start_time = time.time()
         stds = []
         plt.clf()
+        laplace_kernel = cl.Kernel(self.program, 'laplace')
         for i in range(5000):
             # The calculation is sent to d_output, which I then use as the input for another iteration
             # This way, d_input becomes the output and I do not have to create an array each time.  This is very efficient.
 
-            self.program.laplace(
+            laplace_kernel(
                 self.queue, global_size, None, d_input.data, d_output.data, np.int32(w)
             )
-            self.program.laplace(
+            laplace_kernel(
                 self.queue, global_size, None, d_output.data, d_input.data, np.int32(w)
             )
 
@@ -493,8 +494,9 @@ class OpenCLArrayTestCase(unittest.TestCase):
         global_size = (w, h, d)  # Matches the 2D array size
 
         start_time = time.time()
+        laplace3D_kernel = cl.Kernel(program, 'laplace3D')
         for i in range(5000):
-            program.laplace3D(
+            laplace3D_kernel(
                 queue,
                 global_size,
                 None,
@@ -506,7 +508,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
             )
             # The calculation is sent to d_output, which I then use as the input for another iteration
             # This way, d_input becomes the output and I do not have to create an array each time.  This is very efficient.
-            program.laplace3D(
+            laplace3D_kernel(
                 queue,
                 global_size,
                 None,
@@ -623,13 +625,15 @@ class OpenCLArrayTestCase(unittest.TestCase):
         # Create OpenCL buffers
         d_input = cl_array.to_device(self.queue, host_array)  # Copy data to GPU
 
+        zoom_kernel = cl.Kernel(self.program, 'zoom2D_nearest_neighbour')
+        copy_kernel = cl.Kernel(self.program, 'copy')
         for s in range(3):
             host_dest = np.zeros(shape=(2 * h, 2 * w), dtype=np.float32)
             d_output = cl_array.to_device(
                 self.queue, host_dest
             )  # Create an empty GPU array
 
-            self.program.zoom2D_nearest_neighbour(
+            zoom_kernel(
                 self.queue,
                 (w, h),
                 None,
@@ -642,7 +646,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
             w *= 2
 
             d_input = cl_array.empty_like(d_output)
-            self.program.copy(
+            copy_kernel(
                 self.queue, (w, h), None, d_output.data, d_input.data, np.int32(w)
             )
 
@@ -677,6 +681,8 @@ class OpenCLArrayTestCase(unittest.TestCase):
         d_input = cl_array.to_device(self.queue, host_array)  # Copy data to GPU
 
         start_time = time.time()
+        laplace_kernel = cl.Kernel(self.program, 'laplace')
+        zoom_kernel = cl.Kernel(self.program, 'zoom2D_nearest_neighbour')
         for s in range(2):
             host_dest = np.zeros(shape=(h, w), dtype=np.float32)
             d_output = cl_array.to_device(self.queue, host_dest)
@@ -684,10 +690,10 @@ class OpenCLArrayTestCase(unittest.TestCase):
             for i in range(5000):
                 # The calculation is sent to d_output, which I then use as the input for another iteration
                 # This way, d_input becomes the output and I do not have to create an array each time.  This is very efficient.
-                self.program.laplace(
+                laplace_kernel(
                     self.queue, (w, h), None, d_input.data, d_output.data, np.int32(w)
                 )
-                self.program.laplace(
+                laplace_kernel(
                     self.queue, (w, h), None, d_output.data, d_input.data, np.int32(w)
                 )
 
@@ -710,7 +716,7 @@ class OpenCLArrayTestCase(unittest.TestCase):
             zoom_dest = np.zeros(shape=(2 * h, 2 * w), dtype=np.float32)
             d_input = cl_array.to_device(self.queue, zoom_dest)
 
-            self.program.zoom2D_nearest_neighbour(
+            zoom_kernel(
                 self.queue,
                 (w, h),
                 None,

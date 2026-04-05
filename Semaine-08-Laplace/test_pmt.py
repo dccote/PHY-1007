@@ -86,7 +86,7 @@ class PMTTestCase(unittest.TestCase):
         pot.apply_conditions()
         pot.solve_laplace_by_relaxation_with_refinements(factors=[10,3])
         pot.apply_conditions()
-        pot.show(block=True)
+        pot.show(block=False)
 
 
 
